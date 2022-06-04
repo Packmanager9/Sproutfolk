@@ -1678,8 +1678,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.carrying = 0
         }
         draw() {
-            for(let x = 0;x<10;x++){
 
+            for(let x = 0;x<10;x++){
                 this.body.frictiveMove10()
                 this.xcord = Math.floor((this.body.x) / 10) * 10
                 this.xcord = Math.max(this.xcord, 0)
@@ -1733,8 +1733,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         }
                     }
                 }
-    
-
             }
 
             if (this.fly > 0) {
