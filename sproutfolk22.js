@@ -2236,14 +2236,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 let anfle = linkus.angle()
                 airmail.x -= (((Math.cos(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
                 airmail.y -= (((Math.sin(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
-                // linkus.draw()
+                linkus.draw()
                 this.gloppath = 1
                 }
             }else{
-                let linkus = new LineOP(this.clingTo, this.glop, "green", 2)
+                let linkus = new LineOP(this.clingTo, this.glop, "yellow", 2)
                 let anfle = linkus.angle()
                 airmail.x -= (((Math.cos(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
                 airmail.y -= (((Math.sin(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
+                linkus.draw()
             }
             if(this.boglpath == 0){
                 this.bogl = this.glop
@@ -2254,21 +2255,24 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         cap = this.glop.neighbors[p].priority
                     }
                 }
-                if(cap == this.glop.priority){
-                    console.log(this.glop)
-                }
+                // if(cap == this.glop.priority){
+                //     console.log(this.glop)
+                // }
                 if (throbert.path2(this.clingTo, this.bogl)) {
-                let linkg = new LineOP(this.clingTo, this.bogl, "pink", 2)
+                let linkg = new LineOP(this.clingTo, this.bogl, "orange", 2)
                 let anfleg = linkg.angle()
                 airmail.x -= (((Math.cos(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
                 airmail.y -= (((Math.sin(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
                         this.boglpath = 1
+                        linkg.draw()
                 }
             }else{
                 let linkg = new LineOP(this.clingTo, this.bogl, "pink", 2)
                 let anfleg = linkg.angle()
                 airmail.x -= (((Math.cos(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
                 airmail.y -= (((Math.sin(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                linkg.draw()
+
             }
 
 
@@ -3598,11 +3602,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 //     }
                 // }
                 // if(wet == 0){
-                // if (this.nodemap[t].x == 4840 && this.nodemap[t].x == 3760) {
-
-                // } else {
+                    if (this.nodemap[t].x.between(1300, 1500) && this.nodemap[t].y.between(4600, 4900)) {
+                    } else    if (this.nodemap[t].x.between(1000, 1100) && this.nodemap[t].y.between(5250, 5450)) {
+                    } else {
                     this.nodes.push(node)
-                // }
+                }
                 // }
             }
             this.paths = []
@@ -3743,7 +3747,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.target = node2
             let lin = new LineOP(node2, node)
             let anglemake = lin.angle()
-            this.raypoint = new Circle(node.x, node.y, 1, "#FF00FF", Math.cos(anglemake) * 5, Math.sin(anglemake) * 5)
+            this.raypoint = new Circle(node.x, node.y, 1, "#FF00FF", Math.cos(anglemake) * 6, Math.sin(anglemake) * 6)
             this.xcord = Math.floor((this.raypoint.x) * .1) * 10
             this.xcord = Math.max(this.xcord, 0)
             this.xcord = Math.min(this.xcord, 10230)
@@ -3754,7 +3758,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             let last = this.road[`${this.xcord},${this.ycord}`].z
             // let start = this.road[`${this.xcord},${this.ycord}`].z
             // console.log(start)
-            for (let l = 0; l < (1000 *.2); l++) { //600
+            for (let l = 0; l < (1000 *.1825); l++) { //600
                 if (this.raypoint.doesPerimeterTouch(node2.small)) {
                     break
                 }
@@ -3767,15 +3771,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.ycord = Math.min(this.ycord, 10230)
                 for (let t = Math.max(this.xcord - 10, 0); t < Math.min(this.xcord + 20, 10230); t += 10) {
                     for (let k = Math.max(this.ycord - 10, 0); k < Math.min(this.ycord + 20, 10230); k += 10) {
-                        if (true) {
-                            let point = this.road[`${t},${k}`]
-                            let link = new LineOP(this.raypoint, point)
-                            if (link.hypotenuse() <= 20) {
-                                if ((Math.abs(this.road[`${t},${k}`].z - this.road[`${this.xcord},${this.ycord}`].z) >= .0901)) {
+                        // if (true) {
+                            // let point = 
+                            let link = new LineOP(this.raypoint, this.road[`${t},${k}`])
+                            if (link.hypotenuse() <= 16) {
+                                if ((Math.abs(this.road[`${t},${k}`].z - this.road[`${this.xcord},${this.ycord}`].z) >= .11)) {
                                     return false
                                 }
                             }
-                        }
+                        // }
                     }
                 }
                 last = this.road[`${this.xcord},${this.ycord}`].z
@@ -3925,9 +3929,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.c2.draw()
             this.c3.draw()
 
-            // for (let t = 0; t < this.paths.length; t++) {
-            //     this.paths[t].draw()
-            // }
+            for (let t = 0; t < this.paths.length; t++) {
+                this.paths[t].draw()
+            }
             this.speedplay = 1
             this.volumeplay = 1
             let sum = 0     
@@ -4145,14 +4149,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
                 if(this.sproutventory[t].cling == 1){
                     if(this.sproutventory[t].clingTo.health <= 0){
-                        if((Object.keys(omegahash).includes(this.sproutventory[t].clingTo.k))){
+                        if((Object.keys(omegahash).includes(`${this.sproutventory[t].clingTo.k}`))){
                             omegahash[`${this.sproutventory[t].clingTo.k}`].carriers++
+                            // console.log(this.sproutventory[t].clingTo.k, omegahash[`${this.sproutventory[t].clingTo.k}`])
                         }else{
                             let obj = {}
                             this.sproutventory[t].smartpath()
                             obj.carriers = 1
                             obj.x  = airmail.x
                             obj.y  = airmail.y
+                            // console.log(airmail)
                             omegahash[`${this.sproutventory[t].clingTo.k}`] = obj
                         }
                     }
@@ -4370,15 +4376,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
         canvas_context.clearRect(-1000000, -1000000, canvas.width * 10000000, canvas.height * 10000000)
         gamepadAPI.update()
         throbert.draw()
-        if (keysPressed['-'] && recording == 0) {
-            recording = 1
-            video_recorder.record()
-        }
-        if (keysPressed['='] && recording == 1) {
-            recording = 0
-            video_recorder.stop()
-            video_recorder.download('File Name As A String.webm')
-        }
+        // if (keysPressed['-'] && recording == 0) {
+        //     recording = 1
+        //     video_recorder.record()
+        //     keysPressed = {}
+        // }
+        // if (keysPressed['='] && recording == 1) {
+        //     recording = 0
+        //     video_recorder.stop()
+        //     video_recorder.download('File Name As A String.webm')
+        // }
     }
 
 

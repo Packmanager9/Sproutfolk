@@ -2228,7 +2228,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     }
                 }
                 if (this.glop == this.body){
-                    return
+                    this.glop = throbert.nodes[0]
+                    this.gloppath = 0
+                    this.boglpath = 0
                 }
             if(this.gloppath == 0){
                 if (throbert.path2(this.clingTo, this.glop)) {
@@ -3858,13 +3860,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.enemies.push(plug)
                 }
 
-                for (let t = 0; t < 600; t++) {
+                for (let t = 0; t < 100; t++) {
                     let plug = new Ploorenab(2560 + ((Math.random() - .5) * 10230), 2560 + ((Math.random() - .5) * 10230), ['red', "magenta", "orange"])
                     plug.body.x*=2
                     plug.body.y*=2
                     this.enemies.push(plug)
                 }
-                for (let t = 0; t < 90; t++) {
+                for (let t = 0; t < 30; t++) {
                     let nec = new Nectar(2560 + ((Math.random() - .5) * 10230), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
                     nec.body.x*=2
                     nec.body.y*=2
