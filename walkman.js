@@ -1493,7 +1493,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
             this.worldmap = new Image()
-            this.worldmap.src = "nodepix4.png"
+            this.worldmap.src = "mapscan.png"
 
             // canvas_context.drawImage(this.worldmap, 0,0,128,128, -640,-940,2560,2560)
     
@@ -1505,19 +1505,19 @@ window.addEventListener('DOMContentLoaded', (event) => {
         // // // game code goes here
         // walkmin.draw()
         canvas_context.drawImage(this.worldmap, 0,0)
-        let imagedata = canvas_context.getImageData(0,0,512,512)
+        let imagedata = canvas_context.getImageData(0,0,1024,1024)
         let output = []
 
         let countxx
         for(let t = 0;t<imagedata.data.length;t+=4){
             if(imagedata.data[t]==imagedata.data[t+1]){
                 let point = {}
-                point.x = (Math.floor(t/4)%512)*10
-                point.y = Math.floor(Math.floor(t/4)/512)*10
+                point.x = (Math.floor(t/4)%1024)*10
+                point.y = Math.floor(Math.floor(t/4)/1024)*10
                 // point.w = 10
                 // point.h = 10
                 // point.c  = `rgb(${imagedata.data[t]}, ${imagedata.data[t+1]}, ${imagedata.data[t+2]})`
-                point.z = Math.floor((((imagedata.data[t] + imagedata.data[t+1] + imagedata.data[t+2])/3)/255)*10000)/10000
+                point.z =((((imagedata.data[t] + imagedata.data[t+1])/2)/255))
                 output.push(point)
             }
         }
@@ -1528,3 +1528,25 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
 })
+
+
+
+// canvas_context.drawImage(this.worldmap, 0,0)
+// let imagedata = canvas_context.getImageData(0,0,1024,1024)
+// let output = {}
+
+// canvas_context.imageSmoothingEnabled = false
+// let countxx
+// for(let t = 0;t<imagedata.data.length;t+=4){
+//     // if(imagedata.data[t]==imagedata.data[t+1]){
+//         let point = {}
+//         point.x = (Math.floor(t/4)%1024)*10
+//         point.y = Math.floor(Math.floor(t/4)/1024)*10
+//         // point.w = 10
+//         // point.h = 10
+//         // point.c  = `rgb(${imagedata.data[t]}, ${imagedata.data[t+1]}, ${imagedata.data[t+2]})`
+//         point.z =((((imagedata.data[t] + imagedata.data[t+1]+ imagedata.data[t+2]))/255))
+//         // console.log(point.z)
+//         output[`${point.x},${point.y}`] = point
+//     // }
+// }
