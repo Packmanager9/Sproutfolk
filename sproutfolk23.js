@@ -3774,8 +3774,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         // if (true) {
                             // let point = 
                             let link = new LineOP(this.raypoint, this.road[`${t},${k}`])
-                            if (link.hypotenuse() <= 16) {
-                                if ((Math.abs(this.road[`${t},${k}`].z - this.road[`${this.xcord},${this.ycord}`].z) >= .11)) {
+                            if (link.hypotenuse() <= 12) {
+                                if ((Math.abs(this.road[`${t},${k}`].z - this.road[`${this.xcord},${this.ycord}`].z) >= .15)) {
                                     return false
                                 }
                             }

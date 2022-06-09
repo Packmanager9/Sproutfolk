@@ -2489,7 +2489,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.body.draw()
                 } else {
                     this.body.radius *= 2
-                    if (this.playlink.hypotenuse() < 714) {
+                    if (this.playlink.hypotenuse() < 740) {
                         if (this.bloom == 0) {
                             if (this.attent == 1) {
                                 canvas_context.drawImage(this.captain, 0, 0, this.captain.width, this.captain.height, Math.round(this.body.x - this.body.radius), Math.round((this.body.y - this.body.radius) - (this.body.radius * .25)), 2 * this.body.radius, 2 * this.body.radius)
@@ -3548,7 +3548,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.body.timer = 999999999999 * 999999999999
         }
         draw() {
-            if (this.playlink.hypotenuse() > 720) {
+            if (this.playlink.hypotenuse() > 740) {
                 return
             }
             let brf = 0
@@ -4066,6 +4066,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 }
             }
             for (let t = 0; t < this.enemies.length; t++) {
+
+                if (this.enemies[t].body.doesPerimeterTouch(this.c1)) {
+                    this.enemies[t].body.xmom = 0
+                    this.enemies[t].body.ymom = 0
+                    this.enemies[t].body.sxmom = 0
+                    this.enemies[t].body.symom = 0
+                    this.enemies[t].body.x = this.c1.x
+                    this.enemies[t].body.y = this.c1.y
+                }
                 this.enemies[t].body.k = t
                 if (this.enemies[t].health <= 0) {
                     this.enemies[t].body.friction = .982
@@ -4126,10 +4135,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             }
                         }
                     }
-                }
-                if (this.enemies[t].body.doesPerimeterTouch(this.c1)) {
-                    this.enemies[t].body.xmom = 0
-                    this.enemies[t].body.ymom = 0
                 }
             }
 

@@ -4,6 +4,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 
 
+    let globalPrio = 0
     let globalspeedlimit = 6
     let charge = new Audio()
     charge.src = "charge.mp3"
@@ -640,6 +641,34 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.ymom *= 1 - ((1 - this.friction) * 0.05)
         }
 
+        frictiveMoveR10() {
+            if (this.reflect == 1) {
+                if (this.x + this.radius > canvas.width) {
+                    if (this.xmom > 0) {
+                        this.xmom *= -1
+                    }
+                }
+                if (this.y + this.radius > canvas.height) {
+                    if (this.ymom > 0) {
+                        this.ymom *= -1
+                    }
+                }
+                if (this.x - this.radius < 0) {
+                    if (this.xmom < 0) {
+                        this.xmom *= -1
+                    }
+                }
+                if (this.y - this.radius < 0) {
+                    if (this.ymom < 0) {
+                        this.ymom *= -1
+                    }
+                }
+            }
+            this.x += this.xmom * 0.10
+            this.y += this.ymom * 0.10
+            this.xmom *= 1 - ((1 - this.friction) * 0.10)
+            this.ymom *= 1 - ((1 - this.friction) * 0.10)
+        }
         frictiveMove8() {
             if (this.reflect == 1) {
                 if (this.x + this.radius > canvas.width) {
@@ -1793,18 +1822,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 object.y -= speed
             }
             if (keysPressed['d']) {
-                //    loe.index+=2
-                //    loe.index%=loe.tongue.length-1
+                object.x += speed
             }
             if (keysPressed['s']) {
                 object.y += speed
             }
             if (keysPressed['a']) {
-                // loe.index-=2
-                // if(loe.index < 0){
-                //     loe.index =  loe.tongue.length-1
-                // }
-                // loe.index%=loe.tongue.length
+                object.x -= speed
             }
         }
     }
@@ -2200,13 +2224,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.goTo = throbert.c1
                 let index = -1
                 let min = 9999999999 * 9999999999
-                let pr = 1
+                let pr = 999999
                 this.body.neighbors = []
                 let relmin = 9999999999999
                 if (this.glop == this.body || (Math.random() < .05)) { //.33 //|| (Math.random() < .05
                     for (let t = 0; t < throbert.nodes.length; t++) {
                             if (throbert.nodes[t].priority <= pr) {
-                            if (throbert.nodes[t].doesPerimeterTouch(this.clingTo)) {
+                            if (throbert.nodes[t].equity.doesPerimeterTouch(this.clingTo)) {
                             if (this.clingTo.supralinks[t].hypotenuse() < relmin) {
                                 if (throbert.path2(this.clingTo, throbert.nodes[t])) {
                                 relmin = this.clingTo.supralinks[t].hypotenuse()
@@ -2221,8 +2245,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
                     if (throbert.nodes[t].small.doesPerimeterTouch(this.clingTo)) {
                         this.glop = throbert.nodes[t] 
-                        this.gloppath = 0
-                        this.boglpath = 0
+                        // this.clingTo.color = getRandomLightColor()
+                        for(let n = 0;n<this.glop.neighbors.length;n++){
+                            if(this.glop.neighbors[n].priority < this.glop.priority){
+                                this.bogl = this.glop.neighbors[n]
+                                this.gloppath = 0
+                                this.boglpath = 1
+                            }
+                        }
                         break
                     }
                     }
@@ -2301,8 +2331,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             this.hittime++
             this.bloomdriptimer--
-            for (let x = 0; x < 8; x++) {
-                this.body.frictiveMove8()
+            for (let x = 0; x < 10; x++) {
+                this.body.frictiveMoveR10()
                 this.xcord = Math.floor((this.body.x) * .1) * 10
                 this.xcord = Math.max(this.xcord, 0)
                 this.xcord = Math.min(this.xcord, 10230)
@@ -2683,10 +2713,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             this.body.angle += Math.random() - .5
         }
-        draw() {
-            if (this.playlink.hypotenuse() > 750) {
-                return
-            }
+        speedlimit(){
             let brf = 0
             while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit) {
                 brf++
@@ -2697,6 +2724,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.ymom *= .95
                 this.body.sxmom *= .95
                 this.body.symom *= .95
+            }
+        }
+        draw() {
+            if (this.playlink.hypotenuse() > 750) {
+                return
             }
             if (this.health <= 0) {
                 this.body.smove()
@@ -2943,7 +2975,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.hx2.angle = this.angle
 
         }
+        speedlimit(){
+            let brf = 0
+            while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit) {
+                brf++
+                if (brf > 20) {
+                    break
+                }
+                this.body.xmom *= .95
+                this.body.ymom *= .95
+                this.body.sxmom *= .95
+                this.body.symom *= .95
+            }
+        }
         draw() {
+
             if (this.playlink.hypotenuse() > 750) {
                 return
             }
@@ -3011,17 +3057,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             }
 
-            let brf = 0
-            while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit) {
-                brf++
-                if (brf > 20) {
-                    break
-                }
-                this.body.xmom *= .95
-                this.body.ymom *= .95
-                this.body.sxmom *= .95
-                this.body.symom *= .95
-            }
             if (this.health <= 0) {
                 this.body.smove()
             } else {
@@ -3239,7 +3274,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.go = this.body
             this.health = 1000
             this.maxhealth = this.health
-            this.value = 6
+            this.value = 12
             this.body.timer = 999999999999 * 999999999999
             this.body.health = this.health
             this.weight = 10
@@ -3249,11 +3284,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.playlink = new LineOP(this.body, throbert.body)
             this.pulse = 0
         }
-        draw() {
-            if (this.playlink.hypotenuse() > 750) {
-                return
-            }
-
+        speedlimit(){
             let brf = 0
             while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit) {
                 brf++
@@ -3265,6 +3296,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.sxmom *= .95
                 this.body.symom *= .95
             }
+        }
+        draw() {
+            if (this.playlink.hypotenuse() > 750) {
+                return
+            }
+
             if (this.health <= 0) {
                 this.body.smove()
             } else {
@@ -3385,6 +3422,19 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.playlink = new LineOP(this.body, throbert.body)
             this.nectar = 1
         }
+        speedlimit(){
+            // let brf = 0
+            // while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit) {
+            //     brf++
+            //     if (brf > 20) {
+            //         break
+            //     }
+            //     this.body.xmom *= .95
+            //     this.body.ymom *= .95
+            //     this.body.sxmom *= .95
+            //     this.body.symom *= .95
+            // }
+        }
         draw() {
             if (this.playlink.hypotenuse() > 750) {
                 return
@@ -3429,10 +3479,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.body.friction = .89
             this.playlink = new LineOP(this.body, throbert.body)
         }
-        draw() {
-            if (this.playlink.hypotenuse() > 750) {
-                return
-            }
+        speedlimit(){
             let brf = 0
             while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit) {
                 brf++
@@ -3443,6 +3490,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.ymom *= .95
                 this.body.sxmom *= .95
                 this.body.symom *= .95
+            }
+        }
+        draw() {
+            if (this.playlink.hypotenuse() > 750) {
+                return
             }
             if (this.health <= 0) {
                 this.body.smove()
@@ -3547,10 +3599,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.body.weight = 1 / this.weight
             this.body.timer = 999999999999 * 999999999999
         }
-        draw() {
-            if (this.playlink.hypotenuse() > 740) {
-                return
-            }
+        speedlimit(){
             let brf = 0
             while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit) {
                 brf++
@@ -3561,6 +3610,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.ymom *= .95
                 this.body.sxmom *= .95
                 this.body.symom *= .95
+            }
+        }
+        draw() {
+            if (this.playlink.hypotenuse() > 740) {
+                return
             }
             if (this.health <= 0) {
                 this.body.smove()
@@ -3588,8 +3642,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         constructor() {
             this.t = 512
             this.k = 512
-            this.nodemap = newnodes
-            this.nodes = []
+            this.nodemap = specialnodes
             this.map = fatmap
             // console.log(this.map)
             this.road = {}
@@ -3607,77 +3660,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.road[`${t * 10},${k * 10}`] = rect
                 }
             }
-            for (let t = 0; t < this.nodemap.length; t++) {
-                let node = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 1000, "Red")
-                node.priority = this.nodemap[t].z //- (t/100000)
-                // console.log(t,node.priority)
-                node.small = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 20, "Red")
-                node.big = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 200, "Red")
-                let wet = 0
-                // for (let k = 0; k < this.nodes.length; k++) {
-                //     if (node.big.doesPerimeterTouch(this.nodes[k].small)) {
-                //         wet = 1
-                //     }
-                // }
-                // if(wet == 0){
-                    if (this.nodemap[t].x.between(1300, 1500) && this.nodemap[t].y.between(4600, 4900)) {
-                    } else    if (this.nodemap[t].x.between(1000, 1100) && this.nodemap[t].y.between(5250, 5450)) {
-                    } else    if (this.nodemap[t].x.between(1750, 1950) && this.nodemap[t].y.between(4600, 4800)) {
-                    } else {
-                    this.nodes.push(node)
-                }
-                // }
-            }
-            this.paths = []
-            for (let k = 0; k < this.nodes.length; k++) {
-                this.nodes[k].paths = []
-                this.nodes[k].neighbors = []
-            }
-
-            for (let k = 0; k < this.nodes.length; k++) {
-                // this.nodes[k].paths = []
-
-                for (let t = 0; t < this.nodes.length; t++) {
-                    if (k != t) {
-
-                        let link
-                        // let x1 = new LineOP(this.nodes[k], this.c1, "red", 2)
-                        // let x2 = new LineOP(this.nodes[t], this.c1, "red", 2)
-                        // if(x1.hypotenuse()>x2.hypotenuse()){
-                        if (this.nodes[t].priority > this.nodes[k].priority) {
-                            link = new LineOP(this.nodes[t], this.nodes[k], "red", 2)
-                        } else {
-                            link = new LineOP(this.nodes[k], this.nodes[t], "red", 2)
-                        }
-                        // }else{
-                        //     link = new LineOP(this.nodes[t], this.nodes[k], "red", 2)
-                        // }
-
-
-                        // console.log(this.path(this.nodes[t], this.nodes[k]))
-                        if (link.hypotenuse() < 2000) {
-                            if (this.path(this.nodes[k], this.nodes[t])) {//this.path(this.nodes[t], this.nodes[k]) &&
-                                this.nodes[k].paths.push(link)
-                                this.nodes[k].neighbors.push(this.nodes[t])
-                                // this.nodes[t].neighbors.push(this.nodes[k])
-                                this.paths.push(link)
-                            }
-                        }
-                    }
-                }
-            }
-
-
-            for (let t = 0; t < this.nodes.length; t++) {
-                let pri = this.nodes[t].priority
-                let count = 1
-                for (let k = 0; k < this.nodes[t].neighbors.length; k++) {
-                    pri += this.nodes[t].neighbors[k].priority
-                    count++
-                }
-                let avg = pri / count
-                this.nodes[t].priority = ((avg) + (this.nodes[t].priority * 10000)) / 10001
-            }
+            // for (let t = 0; t < this.nodes.length; t++) {
+            //     let pri = this.nodes[t].priority
+            //     let count = 1
+            //     for (let k = 0; k < this.nodes[t].neighbors.length; k++) {
+            //         pri += this.nodes[t].neighbors[k].priority
+            //         count++
+            //     }
+            //     let avg = pri / count
+            //     this.nodes[t].priority = ((avg) + (this.nodes[t].priority * 10000)) / 10001
+            // }
             // //console.log(this)
             this.body = new Circle(5120, 5120, 6, "#090909")
             canvas_context.translate(-(1920+2560), -((1920+2560) + 300))
@@ -3710,8 +3702,80 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             // this.data = canvas_context.getImageData(-640, -940, 2560, 2560)
             // //console.log(this)
-        }
 
+            this.paths = []
+            this.nodes = []
+            this.renode()
+        }
+        renode(){
+            this.nodes = []
+            for (let t = 0; t < this.nodemap.length; t++) {
+                let node = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 600, "Red")
+                node.priority = this.nodemap[t].z //- (t/100000)
+                // console.log(t,node.priority)
+                node.small = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 20, "Red")
+                node.equity = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 600, "Red")
+                node.big = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 200, "Red")
+                let wet = 0
+                // for (let k = 0; k < this.nodes.length; k++) {
+                //     if (node.big.doesPerimeterTouch(this.nodes[k].small)) {
+                //         wet = 1
+                //     }
+                // }
+                // if(wet == 0){
+                    if (this.nodemap[t].x.between(1300, 1500) && this.nodemap[t].y.between(4600, 4900)) {
+                    } else    if (this.nodemap[t].x.between(1000, 1100) && this.nodemap[t].y.between(5250, 5450)) {
+                    } else    if (this.nodemap[t].x.between(1750, 1950) && this.nodemap[t].y.between(4600, 4800)) {
+                    // } else    if (this.nodemap[t].x.between(8100, 8400) && this.nodemap[t].y.between(2400, 2600)) {
+                    } else {
+                    this.nodes.push(node)
+                }
+                // }
+            }
+            this.paths = []
+            for (let k = 0; k < this.nodes.length; k++) {
+                this.nodes[k].paths = []
+                this.nodes[k].neighbors = []
+            }
+
+            for (let k = 0; k < this.nodes.length; k++) {
+                // this.nodes[k].paths = []
+
+                for (let t = 0; t < this.nodes.length; t++) {
+                    if (k != t) {
+                        if(this.nodes[k].priority > this.nodes[t].priority){
+                        }else{
+                            continue
+                        }
+                        let link
+                        // let x1 = new LineOP(this.nodes[k], this.c1, "red", 2)
+                        // let x2 = new LineOP(this.nodes[t], this.c1, "red", 2)
+                        // if(x1.hypotenuse()>x2.hypotenuse()){
+                        if (this.nodes[t].priority > this.nodes[k].priority) {
+                            link = new LineOP(this.nodes[t], this.nodes[k], "red", 2)
+                        } else {
+                            link = new LineOP(this.nodes[k], this.nodes[t], "red", 2)
+                        }
+                        // }else{
+                        //     link = new LineOP(this.nodes[t], this.nodes[k], "red", 2)
+                        // }
+
+
+                        // console.log(this.path(this.nodes[t], this.nodes[k]))
+                        if (link.hypotenuse() < 600) {
+                            if (this.path(this.nodes[k], this.nodes[t])) {//this.path(this.nodes[t], this.nodes[k]) &&
+                                this.nodes[k].paths.push(link)
+                                this.nodes[k].neighbors.push(this.nodes[t])
+                                // this.nodes[t].neighbors.push(this.nodes[k])
+                                this.paths.push(link)
+                            }
+                        }
+                    }
+                }
+            }
+
+
+        }
         path(node, node2) {
             this.target = node2
             let lin = new LineOP(node2, node)
@@ -3727,7 +3791,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             let last = this.road[`${this.xcord},${this.ycord}`].z
             // let start = this.road[`${this.xcord},${this.ycord}`].z
             // console.log(start)
-            for (let l = 0; l < (2000 * .5); l++) {
+            for (let l = 0; l < (600 * .5); l++) {
                 if (this.raypoint.doesPerimeterTouch(node2.small)) {
                     break
                 }
@@ -3751,7 +3815,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             //     return false
                             // }
                             if (link.hypotenuse() <= 8) {
-                                if ((Math.abs(this.road[`${t},${k}`].z - this.road[`${this.xcord},${this.ycord}`].z) >= .0901)) {
+                                if ((Math.abs(this.road[`${t},${k}`].z - this.road[`${this.xcord},${this.ycord}`].z) >= .2)) {
                                     return false
                                 }
                             }
@@ -3777,7 +3841,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             let last = this.road[`${this.xcord},${this.ycord}`].z
             // let start = this.road[`${this.xcord},${this.ycord}`].z
             // console.log(start)
-            for (let l = 0; l < (1000 *.1825); l++) { //600
+            for (let l = 0; l < (600 *.1825); l++) { //600
                 if (this.raypoint.doesPerimeterTouch(node2.small)) {
                     break
                 }
@@ -3794,7 +3858,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             // let point = 
                             let link = new LineOP(this.raypoint, this.road[`${t},${k}`])
                             if (link.hypotenuse() <= 12) {
-                                if ((Math.abs(this.road[`${t},${k}`].z - this.road[`${this.xcord},${this.ycord}`].z) >= .15)) {
+                                if ((Math.abs(this.road[`${t},${k}`].z - this.road[`${this.xcord},${this.ycord}`].z) >= .2)) {
                                     return false
                                 }
                             }
@@ -3839,6 +3903,32 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
         draw() {
+
+            // if(keysPressed['x']){
+            //     this.nodemap.splice(this.nodemap.length-1,1)
+            //     this.renode()
+            //     keysPressed = {}
+            // }
+            // if(keysPressed['l']){
+            //     console.log(JSON.stringify(this.nodemap))
+            // }
+            // if(keysPressed['r']){
+            //     globalPrio++
+            //     keysPressed = {}
+            // }
+            // if(keysPressed['f']){
+            //     globalPrio--
+            //     keysPressed = {}
+            // }
+            // if(keysPressed[' ']){
+            //     let node = {}
+            //     node.x = this.body.x
+            //     node.y = this.body.y
+            //     node.z = globalPrio
+            //     this.nodemap.push(node)
+            //     this.renode()
+            //     keysPressed = {}
+            // }
             // this.sproutventory = this.sproutventory.sort((a,b) => a.body.y < b.body.y ? 1 : -1)
 
             if (this.first == 0) {
@@ -3881,14 +3971,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.enemies.push(plug)
                 }
 
-                for (let t = 0; t < 600; t++) {
-                    let plug = new Ploorenab(2560 + ((Math.random() - .5) * 10230), 2560 + ((Math.random() - .5) * 10230), ['red', "magenta", "orange"])
+                for (let t = 0; t < 400; t++) {
+                    let plug = new Ploorenab(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
+                    plug.body.x*=2
+                    plug.body.y*=2
+                    this.enemies.push(plug)
+                }
+                for (let t = 0; t < 100; t++) {
+                    let plug = new Gloobleglat(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
                     plug.body.x*=2
                     plug.body.y*=2
                     this.enemies.push(plug)
                 }
                 for (let t = 0; t < 90; t++) {
-                    let nec = new Nectar(2560 + ((Math.random() - .5) * 10230), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
+                    let nec = new Nectar(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
                     nec.body.x*=2
                     nec.body.y*=2
                     this.enemies.push(nec)
@@ -3947,9 +4043,27 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.c1.draw()
             this.c2.draw()
             this.c3.draw()
+            // for (let t = 0; t < this.nodes.length; t++) {
+            //     let link = new LineOP(this.nodes[t], this.body)
+            //     if(link.hypotenuse() < 600){
+            //         this.nodes[t].color = `rgb(${this.nodes[t].priority*25},${this.nodes[t].priority*10},${128+(this.nodes[t].priority*4)})`
+            //         this.nodes[t].draw()
+            //         canvas_context.fillStyle = "#FFFF00"
+            //         canvas_context.font = "30px arial"
+            //         canvas_context.fillText(this.nodes[t].priority, this.nodes[t].x,this.nodes[t].y)
+            //     }
+            // }
 
             // for (let t = 0; t < this.paths.length; t++) {
+            //     this.paths[t].color = `rgb(${this.paths[t].object.priority*25},${this.paths[t].object.priority*10},${128+(this.paths[t].object.priority*4)})`
+
+            //     // let point = new Point((this.paths[t].object.x+this.paths[t].target.x)*.5, (this.paths[t].object.y+this.paths[t].target.y)*.5)
+
+            //     this.paths[t].width = 4
             //     this.paths[t].draw()
+            //     // canvas_context.fillStyle = "#00FF00"
+            //     // canvas_context.font = "30px arial"
+            //     // canvas_context.fillText(this.paths[t].object.priority+','+this.paths[t].target.priority, point.x,point.y)
             // }
             this.speedplay = 1
             this.volumeplay = 1
@@ -3972,6 +4086,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             let xdiff = this.body.x
             let ydiff = this.body.y
+            // control(this.body, 10)
             gamepad_control(this.body, 6)
             this.body.friction = 0.15
             for (let x = 0; x < 20; x++) {
@@ -4068,6 +4183,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             for (let t = 0; t < this.enemies.length; t++) {
 
+                this.enemies[t].speedlimit()
                 if (this.enemies[t].body.doesPerimeterTouch(this.c1)) {
                     this.enemies[t].body.xmom = 0
                     this.enemies[t].body.ymom = 0
@@ -4400,6 +4516,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             canvas_context.fillText(this.sproutventory.length, this.body.x - 620, this.body.y - 210)
             canvas_context.fillStyle = "purple"
             canvas_context.fillText('FPS: ' +oldframes, this.body.x - 620, this.body.y - 180)
+            // canvas_context.fillStyle = "white"
+            // canvas_context.fillText('Priority: ' +globalPrio, this.body.x - 620, this.body.y - 150)
             // //console.log(this)
 
             if (gamepadAPI.buttonsStatus.includes('RB') || gamepadAPI.buttonsStatus.includes('LB')) {
