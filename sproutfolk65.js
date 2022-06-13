@@ -5788,7 +5788,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                     this.sproutventory[k].carrying = 0
                                 }
 
-                                if(this.clingfilm == 1 ||this.sproutventory[k].fly > 0){
+                                if(this.clingfilm == 1 ||this.sproutventory[k].fly > 0 || this.sproutventory[k].attent <= 0){
                                     if (this.sproutventory[k].cling != 1) {
                                         this.sproutventory[k].clingTo = this.enemies[t].body
                                         this.sproutventory[k].clingx = -(this.enemies[t].body.x - this.sproutventory[k].body.x)
