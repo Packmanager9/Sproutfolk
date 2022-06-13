@@ -3150,7 +3150,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 }
             }
             if (this.health > 0) {
-                this.body.radius = 40
+                this.body.radius = 30
                 if (Math.random() < .13) {
                     if (Math.random() < .2) {
                         this.spin = -Math.random() * .2
@@ -3199,56 +3199,59 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
 
             for (let t = 0; t < this.legs.length; t++) {
-                this.legs[t].x = this.body.x + (Math.cos(this.legangle +this.angle + this.legs[t].offsetangle) * 100)
-                this.legs[t].y = this.body.y + (Math.sin(this.legangle +this.angle + this.legs[t].offsetangle) * 100)
+                this.legs[t].x = this.body.x + (Math.cos(this.legangle +this.angle + this.legs[t].offsetangle) *( Math.min(this.body.radius,30)*3.3))
+                this.legs[t].y = this.body.y + (Math.sin(this.legangle +this.angle + this.legs[t].offsetangle) * ( Math.min(this.body.radius,30)*3.3))
+                this.legs[t].radius = Math.min(this.body.radius,32)*.25
                 this.legangle+=Math.PI*.4
 
                 this.legs[t].link.draw()
                 this.legs[t].draw()
-                this.legs[t].bumper.x = this.legs[t].x
-                this.legs[t].bumper.y = this.legs[t].y
-                if(this.health < this.maxhealth){
-
-                    if (this.legindex == t) {
-                        if (throbert.body.doesPerimeterTouch(this.legs[t].bumper)) {
-                            throbert.health--
-                        }
-
-                        this.legs[t].bumper.draw()
-                        for (let k = 0; k < throbert.sproutventory.length; k++) {
-                            const pang = this.elinks[k].angle()
-                            if (throbert.sproutventory[k].fly <= 0 && throbert.sproutventory[k].grounded != 1) {//&& throbert.sproutventory[k].cling != 1
-                                if (throbert.sproutventory[k].body.doesPerimeterTouch(this.legs[t].bumper)) {
-                                    if (throbert.sproutventory[k].bloomdriptimer <= 0) {
-                                        if (throbert.sproutventory[k].bloom <= 0) {
-                                            throbert.sproutventory[k].marked = 20
-                                            throbert.sproutventory[k].body.xmom = 0
-                                            throbert.sproutventory[k].body.ymom = 0
-                                            throbert.sproutventory[k].body.friction = 0
+                if(this.health > 0){
+                    this.legs[t].bumper.x = this.legs[t].x
+                    this.legs[t].bumper.y = this.legs[t].y
+                    if(this.health < this.maxhealth){
+    
+                        if (this.legindex == t) {
+                            if (throbert.body.doesPerimeterTouch(this.legs[t].bumper)) {
+                                throbert.health--
+                            }
+    
+                            this.legs[t].bumper.draw()
+                            for (let k = 0; k < throbert.sproutventory.length; k++) {
+                                const pang = this.elinks[k].angle()
+                                if (throbert.sproutventory[k].fly <= 0 && throbert.sproutventory[k].grounded != 1) {//&& throbert.sproutventory[k].cling != 1
+                                    if (throbert.sproutventory[k].body.doesPerimeterTouch(this.legs[t].bumper)) {
+                                        if (throbert.sproutventory[k].bloomdriptimer <= 0) {
+                                            if (throbert.sproutventory[k].bloom <= 0) {
+                                                throbert.sproutventory[k].marked = 20
+                                                throbert.sproutventory[k].body.xmom = 0
+                                                throbert.sproutventory[k].body.ymom = 0
+                                                throbert.sproutventory[k].body.friction = 0
+                                            } else {
+                                                throbert.sproutventory[k].body.xmom += Math.cos(pang)
+                                                throbert.sproutventory[k].body.ymom += Math.sin(pang)
+                                                throbert.sproutventory[k].bloomdriptimer = 25
+                                                throbert.sproutventory[k].bloom -= 1
+                                            }
                                         } else {
                                             throbert.sproutventory[k].body.xmom += Math.cos(pang)
                                             throbert.sproutventory[k].body.ymom += Math.sin(pang)
-                                            throbert.sproutventory[k].bloomdriptimer = 25
-                                            throbert.sproutventory[k].bloom -= 1
                                         }
-                                    } else {
-                                        throbert.sproutventory[k].body.xmom += Math.cos(pang)
-                                        throbert.sproutventory[k].body.ymom += Math.sin(pang)
                                     }
                                 }
                             }
-                        }
-    
-    
-                        if (this.legs[t].dir == 1) {
-                            this.legs[t].offsetangle += .04
-                            if (Math.abs(this.legs[t].offsetangle) > 1) {
-                                this.legs[t].dir *= -1
-                            }
-                        } else {
-                            this.legs[t].offsetangle -= .04
-                            if (Math.abs(this.legs[t].offsetangle) > 1) {
-                                this.legs[t].dir *= -1
+        
+        
+                            if (this.legs[t].dir == 1) {
+                                this.legs[t].offsetangle += .04
+                                if (Math.abs(this.legs[t].offsetangle) > 1) {
+                                    this.legs[t].dir *= -1
+                                }
+                            } else {
+                                this.legs[t].offsetangle -= .04
+                                if (Math.abs(this.legs[t].offsetangle) > 1) {
+                                    this.legs[t].dir *= -1
+                                }
                             }
                         }
                     }
