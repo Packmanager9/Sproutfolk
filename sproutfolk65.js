@@ -560,7 +560,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.xmom *= this.friction
             this.ymom *= this.friction
         }
-        frictiveMove10() {
+        frictiveMove10(t = 0) {
+            if(t == 1){
+            TIP_engine.x += this.xmom * 0.05
+            TIP_engine.y += this.ymom * 0.05
+            }
             this.x += this.xmom * 0.05
             this.y += this.ymom * 0.05
             this.xmom *= 1 - ((1 - this.friction) * 0.05)
@@ -1629,22 +1633,31 @@ window.addEventListener('DOMContentLoaded', (event) => {
             FLEX_engine = canvas.getBoundingClientRect();
             XS_engine = e.clientX - FLEX_engine.left;
             YS_engine = e.clientY - FLEX_engine.top;
-            TIP_engine.x = XS_engine
-            TIP_engine.y = YS_engine
+            const txfr = canvas_context.getTransform()
+            TIP_engine.x = XS_engine-txfr.e
+            TIP_engine.y = YS_engine-txfr.f
             TIP_engine.body = TIP_engine
             // example usage: if(object.isPointInside(TIP_engine)){ take action }
             window.addEventListener('pointermove', continued_stimuli);
         });
         window.addEventListener('pointerup', e => {
+            throbert.guiding = 0
+
             window.removeEventListener("pointermove", continued_stimuli);
         })
         function continued_stimuli(e) {
             FLEX_engine = canvas.getBoundingClientRect();
             XS_engine = e.clientX - FLEX_engine.left;
             YS_engine = e.clientY - FLEX_engine.top;
-            TIP_engine.x = XS_engine
-            TIP_engine.y = YS_engine
+            const txfr = canvas_context.getTransform()
+            TIP_engine.x = XS_engine-txfr.e
+            TIP_engine.y = YS_engine-txfr.f
             TIP_engine.body = TIP_engine
+            let link = (new LineOPD(TIP_engine,throbert.body )).angle()
+            let link2 = (new LineOPD(TIP_engine,throbert.body )).hypotenuse()
+            throbert.seekz = (Math.cos(link)*(Math.min(95, link2)))
+            throbert.seekw = (Math.sin(link)*(Math.min(95, link2)))
+            throbert.guiding = 1
         }
     }
     function gamepad_control(object, speed = 1) { // basic control for objects using the controler
@@ -1978,10 +1991,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
     class Sproutfolk {
         constructor(x, y, type) {
             this.hittime = Math.floor(Math.random() * 100)
-
             this.bloomdriptimer = 0
             this.bloom = 0
             this.body = new Circle(x, y, 3, guycolors[type][0])
+            this.cursorline = new LineOPD(TIP_engine, this.body)
             this.body.friction = .8
             this.grounded = 1
             this.supersize = 9
@@ -5550,18 +5563,25 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if(this.ijklflag == 1){
                 this.clingfilm = 1
             }
-            if (Math.abs(gamepadAPI.axesStatus[2]) > 0.09 || Math.abs(gamepadAPI.axesStatus[3]) > 0.09) {
-                if (((gamepadAPI.buttonsStatus.includes('Axis-Right') || gamepadAPI.buttonsStatus.includes('DPad-Up')))) {
-                    if(this.ijklflag == 1){
+            if(this.guiding == 1){
+                    this.clingfilm = 1
+                    this.seekx = ((this.seekx * 3) + (this.seekz)) * .25
+                    sum += 1
+                    this.seeky = ((this.seeky * 3) + (this.seekw)) * .25
+            }else{
+                if (Math.abs(gamepadAPI.axesStatus[2]) > 0.09 || Math.abs(gamepadAPI.axesStatus[3]) > 0.09) {
+                    if (((gamepadAPI.buttonsStatus.includes('Axis-Right') || gamepadAPI.buttonsStatus.includes('DPad-Up')))) {
+                        if(this.ijklflag == 1){
+                            this.clingfilm = 1
+                        }
+                    } else {
                         this.clingfilm = 1
                     }
-                } else {
-                    this.clingfilm = 1
+                    sum += Math.abs(gamepadAPI.axesStatus[2]) * 1
+                    this.seekx = ((this.seekx * 9) + ((gamepadAPI.axesStatus[2]) * 95)) * .1
+                    sum += Math.abs(gamepadAPI.axesStatus[3]) * 1
+                    this.seeky = ((this.seeky * 9) + ((gamepadAPI.axesStatus[3]) * 95)) * .1
                 }
-                sum += Math.abs(gamepadAPI.axesStatus[2]) * 1
-                this.seekx = ((this.seekx * 9) + ((gamepadAPI.axesStatus[2]) * 95)) / 10
-                sum += Math.abs(gamepadAPI.axesStatus[3]) * 1
-                this.seeky = ((this.seeky * 9) + ((gamepadAPI.axesStatus[3]) * 95)) / 10
             }
             this.volumeplay = sum / 3
 
@@ -5583,7 +5603,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             this.body.friction = 0.15
             for (let x = 0; x < 20; x++) {
-                this.body.frictiveMove10()
+                this.body.frictiveMove10(1)
                 this.xcord = Math.floor((this.body.x) * .1) * ten
                 this.xcord = Math.max(this.xcord, 0)
                 this.xcord = Math.min(this.xcord, 10230)
@@ -6031,7 +6051,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             if (this.sproutventory[t].cling != 1) {
                                 if (this.sproutventory[t].attent == 1) {
                                     if (!gamepadAPI.buttonsStatus.includes('Left-Trigger') && !gamepadAPI.buttonsStatus.includes('Right-Trigger')) {
-                                        if (Math.abs(gamepadAPI.axesStatus[2]) > 0.09 || Math.abs(gamepadAPI.axesStatus[3]) > 0.09 || this.ijklflag == 1) {
+                                        if (Math.abs(gamepadAPI.axesStatus[2]) > 0.09 || Math.abs(gamepadAPI.axesStatus[3]) > 0.09 || this.ijklflag == 1 || this.guiding == 1) {
                                             if (this.ijklflag == 1) {
                                                 if (!keysPressed[' ']) {
                                                     this.sproutventory[t].body.xmom += Math.cos(this.seekline.angle()) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
@@ -6039,6 +6059,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                                     if (this.sproutventory[t].type == 0) {
                                                         this.sproutventory[t].body.xmom += Math.cos(this.seekline.angle()) * .1 * (1 + (this.sproutventory[t].bloom * .2))
                                                         this.sproutventory[t].body.ymom += Math.sin(this.seekline.angle()) * .1 * (1 + (this.sproutventory[t].bloom * .2))
+                                                    }
+                                                }
+                                            }else if(this.guiding == 1){
+
+                                                if (!keysPressed[' ']) {
+                                                    const angle = this.sproutventory[t].cursorline.angle()
+                                                    this.sproutventory[t].body.xmom += Math.cos(angle) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
+                                                    this.sproutventory[t].body.ymom += Math.sin(angle) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
+                                                    if (this.sproutventory[t].type == 0) {
+                                                        this.sproutventory[t].body.xmom += Math.cos(angle) * .1 * (1 + (this.sproutventory[t].bloom * .2))
+                                                        this.sproutventory[t].body.ymom += Math.sin(angle) * .1 * (1 + (this.sproutventory[t].bloom * .2))
                                                     }
                                                 }
                                             } else {
