@@ -1640,8 +1640,22 @@ window.addEventListener('DOMContentLoaded', (event) => {
             // example usage: if(object.isPointInside(TIP_engine)){ take action }
             window.addEventListener('pointermove', continued_stimuli);
         });
+        window.addEventListener('contextmenu', e => {
+            e.preventDefault()
+            throbert.whistling = 1
+            FLEX_engine = canvas.getBoundingClientRect();
+            XS_engine = e.clientX - FLEX_engine.left;
+            YS_engine = e.clientY - FLEX_engine.top;
+            const txfr = canvas_context.getTransform()
+            TIP_engine.x = XS_engine-txfr.e
+            TIP_engine.y = YS_engine-txfr.f
+            TIP_engine.body = TIP_engine
+            // example usage: if(object.isPointInside(TIP_engine)){ take action }
+            window.addEventListener('pointermove', continued_stimuli);
+        });
         window.addEventListener('pointerup', e => {
             throbert.guiding = 0
+            throbert.whistling = 0
 
             window.removeEventListener("pointermove", continued_stimuli);
         })
@@ -5434,7 +5448,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
 
 
-            if (gamepadAPI.buttonsStatus.includes('RB') || gamepadAPI.buttonsStatus.includes('LB') || keysPressed['x']) {
+            if (gamepadAPI.buttonsStatus.includes('RB') || gamepadAPI.buttonsStatus.includes('LB') || keysPressed['x'] || keysPressed['z']) {
                 if (gamepadAPI.buttonsStatus.includes('LB') || keysPressed['x']) {
                     for (let t = 0; t < this.sproutventory.length; t++) {
                         if (this.sproutventory[t].grounded != 1) {
@@ -5732,9 +5746,22 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     }
                     for (let k = 0; k < this.sproutventory.length; k++) {
                         if (this.sproutventory[k].grounded != 1) {  //&& (this.sproutventory[k].hittime % 2 == 0 || this.sproutventory[k].fly > 0)
-                            if (this.sproutventory[k].elinks[t].hypotenuse() > 400) {
+                            const len = this.sproutventory[k].elinks[t].hypotenuse() 
+                            const angle = this.sproutventory[k].elinks[t].angle() 
+                            if (len> 400) {
                                 continue
                             }
+                            if (len < (this.enemies[t].body.radius*5)) {
+                                if(this.sproutventory[k].fly > 0){
+                                    this.sproutventory[k].body.xmom -= Math.cos(angle)*0.2
+                                    this.sproutventory[k].body.ymom -= Math.sin(angle)*0.2
+                                }else if(this.sproutventory[k].attent < 1){
+                                    this.sproutventory[k].body.xmom -= Math.cos(angle)*2.2
+                                    this.sproutventory[k].body.ymom -= Math.sin(angle)*2.2
+                                }
+                            }
+
+                            
                             if (this.enemies[t].body.doesPerimeterTouch(this.sproutventory[k].body)) {
                                 if(this.enemies[t].body == this.sproutventory[k].clingTo){
                                     this.enemies[t].health -= this.sproutventory[k].damage * (1 + (this.sproutventory[k].bloom * .2))
@@ -5761,7 +5788,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                     this.sproutventory[k].carrying = 0
                                 }
 
-                                if(this.clingfilm == 1 ||this.sproutventory[k].fly >= 0){
+                                if(this.clingfilm == 1 ||this.sproutventory[k].fly > 0){
                                     if (this.sproutventory[k].cling != 1) {
                                         this.sproutventory[k].clingTo = this.enemies[t].body
                                         this.sproutventory[k].clingx = -(this.enemies[t].body.x - this.sproutventory[k].body.x)
@@ -5775,7 +5802,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                         }
                                     }
                                 }else{
-                                    const angle = this.sproutventory[k].elinks[t].angle()
+                                    
                                     this.sproutventory[k].body.xmom += Math.cos(angle)*2.2
                                     this.sproutventory[k].body.ymom += Math.sin(angle)*2.2
                                 }
@@ -5805,7 +5832,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 }
             }
 
-            if (keysPressed['u'] || gamepadAPI.buttonsStatus.includes('Right-Trigger')) {
+            if (keysPressed['u'] ||keysPressed['q'] || gamepadAPI.buttonsStatus.includes('Right-Trigger') || this.whistling == 1) {
                 for (let t = 0; t < this.sproutventory.length; t++) {
                     if (this.sproutventory[t].ignore != 1) {
                         if (this.sproutventory[t].grounded != 1) {
@@ -5855,6 +5882,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 if (this.sproutventory[t].cling == 1) {
                     if (this.sproutventory[t].clingTo.health <= 0) {
                         if ((Object.keys(omegahash).includes(`${this.sproutventory[t].clingTo.k}`))) {
+                            if( omegahash[`${this.sproutventory[t].clingTo.k}`].carriers > (1/this.sproutventory[t].clingTo.weight)*2){
+                                this.sproutventory[t].cling = 0
+                            }
                             omegahash[`${this.sproutventory[t].clingTo.k}`].carriers++
                             if (this.sproutventory[t].type == 0) {
                                 omegahash[`${this.sproutventory[t].clingTo.k}`].carriers++
@@ -6093,7 +6123,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.sproutventory[t].draw()
 
                 // this.sproutventory[t].body.frictiveMove()
-                if (keysPressed['o'] || gamepadAPI.buttonsStatus.includes('A') || gamepadAPI.buttonsStatus.includes('Left-Trigger')) {
+                if (keysPressed['o'] || keysPressed['e'] || gamepadAPI.buttonsStatus.includes('A') || gamepadAPI.buttonsStatus.includes('Left-Trigger')) {
                     if (length < this.supersize) {
                         if (this.sproutventory[t].grounded == 1) {
                             this.sproutventory[t].grounded = -3
