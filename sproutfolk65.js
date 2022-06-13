@@ -9,7 +9,29 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const globalspeedlimit = 6
     let charge = new Audio()
     charge.src = "charge.mp3"
+    let whistle = new Audio()
+    whistle.src = "whistle.mp3"
+    whistle.volume = .3 
     let beamboss = new Audio()
+    let absorb = new Audio()
+    absorb.src = "absorb.mp3"
+
+    const worksounds = []
+    for (let t = 1; t < 11; t++) {
+        let sound = new Audio()
+        sound.src = `workdeath${t}.mp3`
+        sound.volume = .6 - (t * .025)
+        worksounds.push(sound)
+    }
+    const enemysounds = []
+    for (let t = 1; t < 3; t++) {
+        let sound = new Audio()
+        sound.src = `enemydeath${t}.mp3`
+        sound.volume = .6 - (t * .025)
+        enemysounds.push(sound)
+    }
+
+
     beamboss.src = "beambosslong.mp3"
     beamboss.volume = .25
     const squaretable = {} // this section of code is an optimization for use of the hypotenuse function on Line and LineOP objects
@@ -1637,6 +1659,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             TIP_engine.x = XS_engine - txfr.e
             TIP_engine.y = YS_engine - txfr.f
             TIP_engine.body = TIP_engine
+            throbert.whistling = 0
             // example usage: if(object.isPointInside(TIP_engine)){ take action }
             window.addEventListener('pointermove', continued_stimuli);
         });
@@ -2430,6 +2453,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.radius = 3.5 + (Math.abs(this.grounded)) + (Math.abs(this.grab * 1.5)) + (Math.abs(Math.max(this.fly, 0) * .16))
                 if (this.marked > 0) {
                     // //console.log("hitt")
+                    if(this.marked == 19){
+                        for (let t = 0; t < worksounds.length; t++) {
+                            if (worksounds[t].paused) {
+                                worksounds[t].play()
+                                break
+                            }
+                        }
+                    }
                     this.body.radius += Math.max((20 - this.marked), 0) * .5
                 }
                 if (this.grounded < 0) {
@@ -2472,6 +2503,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         this.body.ymom = 0
                         if (this.clingTo.timer > 20) {
                             this.clingTo.timer = 20
+                            if(throbert.playlink.hypotenuse() < 900){
+                                absorb.play()
+                            }
                         }
 
                         this.playlink = new LineOP(this.body, throbert.body)
@@ -2636,6 +2670,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.playlink.hypotenuse() > 950) {
                 return
             }
+            
             if (this.health <= 0) {
                 this.body.smove()
             } else {
@@ -3382,6 +3417,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.pen = pen
             this.body.friction = .9
             this.playlink = new LineOP(this.body, throbert.body)
+            this.firstdead =0
         }
 
         nameGenerator() {
@@ -3523,8 +3559,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.playlink.hypotenuse() > 750) {
                 return
             }
+
             if (this.health <= 0) {
                 this.body.smove()
+                if (this.firstdead == 0) {
+                    this.firstdead = 1
+                    for (let t = 0; t < enemysounds.length; t++) {
+                        if (enemysounds[t].paused) {
+                            enemysounds[t].play()
+                            break
+                        }
+                    }
+                }
             } else {
 
                 for (let x = 0; x < 20; x++) {
@@ -3794,6 +3840,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.playlink = new LineOPD(this.body, throbert.body)
             this.spoutcount = 0
             this.shots = []
+            this.firstdead =0
         }
 
         jumpspin() {
@@ -3822,8 +3869,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.playlink.hypotenuse() > 1200) {
                 return
             }
+
             if (this.health <= 0) {
                 this.body.smove()
+                if (this.firstdead == 0) {
+                    this.firstdead = 1
+                    for (let t = 0; t < enemysounds.length; t++) {
+                        if (enemysounds[t].paused) {
+                            enemysounds[t].play()
+                            break
+                        }
+                    }
+                }
             } else {
 
                 for (let x = 0; x < 20; x++) {
@@ -4140,6 +4197,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.playlink = new LineOPD(this.body, throbert.body)
             this.spoutcount = 0
             this.shots = []
+            this.firstdead =0
         }
 
         jumpspin() {
@@ -4168,8 +4226,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.playlink.hypotenuse() > 1200) {
                 return
             }
+
             if (this.health <= 0) {
                 this.body.smove()
+                if (this.firstdead == 0) {
+                    this.firstdead = 1
+                    for (let t = 0; t < enemysounds.length; t++) {
+                        if (enemysounds[t].paused) {
+                            enemysounds[t].play()
+                            break
+                        }
+                    }
+                }
             } else {
 
                 for (let x = 0; x < 20; x++) {
@@ -4854,6 +4922,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.cycle = 0
             this.playlink = new LineOPD(this.body, throbert.body)
             this.pulse = 0
+            this.firstdead =0
         }
         speedlimit() {
             let brf = 0
@@ -4875,6 +4944,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             if (this.health <= 0) {
                 this.body.smove()
+                if (this.firstdead == 0) {
+                    this.firstdead = 1
+                    for (let t = 0; t < enemysounds.length; t++) {
+                        if (enemysounds[t].paused) {
+                            enemysounds[t].play()
+                            break
+                        }
+                    }
+                }
             } else {
 
                 for (let x = 0; x < 20; x++) {
@@ -5059,6 +5137,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.playlink = new LineOPD(this.body, throbert.body)
             this.step = Math.floor(Math.random() * 18)
             this.type = Math.floor(Math.random() * 2)
+            this.firstdead =0
         }
         speedlimit() {
             let brf = 0
@@ -5079,6 +5158,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             if (this.health <= 0) {
                 this.body.smove()
+
+
+                if (this.firstdead == 0) {
+                    this.firstdead = 1
+                    for (let t = 0; t < enemysounds.length; t++) {
+                        if (enemysounds[t].paused) {
+                            enemysounds[t].play()
+                            break
+                        }
+                    }
+                }
             } else {
 
                 for (let x = 0; x < 20; x++) {
@@ -5356,7 +5446,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             // this.data = canvas_context.getImageData(-640, -940, 2560, 2560)
             // ////console.log(this)
-
+            this.playlink = new LineOPD(this.c1, this.body)
             this.paths = []
             this.nodes = []
             this.renode()
@@ -6105,7 +6195,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             if (len > 400) {
                                 continue
                             }
-                            if (len < (this.enemies[t].body.radius * 5)) {
+                            if (len < Math.min((this.enemies[t].body.radius * 5), (35+this.enemies[t].body.radius))) {
                                 if (this.sproutventory[k].fly > 0) {
                                     this.sproutventory[k].body.xmom -= Math.cos(angle) * 0.2
                                     this.sproutventory[k].body.ymom -= Math.sin(angle) * 0.2
@@ -6218,9 +6308,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.seek.radius *= 1.1
                     this.seek.radius += 2
                 }
+                // if (keysPressed['u'] || keysPressed['q'] || gamepadAPI.buttonsStatus.includes('Right-Trigger') ){
+                    // if(this.guiding != 1){
+                    whistle.play()
+                    // }
+                // }
             } else {
                 this.seek.radius = 8
                 this.seek.color = "#FF00FF"
+
+                whistle.pause()
             }
 
             this.magsetoff = 1.2 + (this.sproutventory.length * .002)
