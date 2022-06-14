@@ -5463,11 +5463,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
             let nodespecial2 = new CircleS(700, 9700, 600, "Red")
             nodespecial2.priority = 100 //this.nodemap[t].z //- (t/100000)
             // //console.log(t,node.priority)
-            nodespecial2.small = new CircleS(8761, 6195, 20, "Red")
-            nodespecial2.equity = new CircleS(8761, 6195, 660, "Red")
-            nodespecial2.big = new CircleS(8761, 6195, 200, "Red")
+            nodespecial2.small = new CircleS(700, 9700, 20, "Red")
+            nodespecial2.equity = new CircleS(700, 9700, 660, "Red")
+            nodespecial2.big = new CircleS(700, 9700, 200, "Red")
+            let nodespecial3 = new CircleS(7444, 9756, 600, "Red")
+            nodespecial3.priority = 100 //this.nodemap[t].z //- (t/100000)
+            // //console.log(t,node.priority)
+            nodespecial3.small = new CircleS(7444, 9756,  20, "Red")
+            nodespecial3.equity = new CircleS(7444, 9756, 660, "Red")
+            nodespecial3.big = new CircleS(7444, 9756, 200, "Red")
 
-            this.nodes = [nodespecial, nodespecial2]
+            this.nodes = [nodespecial, nodespecial2, nodespecial3]
             for (let t = 0; t < this.nodemap.length; t++) {
                 let node = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 600, "Red")
                 node.priority = this.nodemap[t].z //- (t/100000)
@@ -6201,7 +6207,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             if (len > 400) {
                                 continue
                             }
-                            if (len < Math.min((this.enemies[t].body.radius * 5), (35+this.enemies[t].body.radius))) {
+                            if (len < Math.min((this.enemies[t].body.radius * 5), (45+this.enemies[t].body.radius)) && this.enemies[t].body.capped != 1) {
                                 if (this.sproutventory[k].fly > 0) {
                                     this.sproutventory[k].body.xmom -= Math.cos(angle) * 0.2
                                     this.sproutventory[k].body.ymom -= Math.sin(angle) * 0.2
@@ -6341,6 +6347,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         if ((Object.keys(omegahash).includes(`${this.sproutventory[t].clingTo.k}`))) {
                             if (omegahash[`${this.sproutventory[t].clingTo.k}`].carriers > (1 / this.sproutventory[t].clingTo.weight) * 2) {
                                 this.sproutventory[t].cling = 0
+                                this.sproutventory[t].hittime = 1
+                                this.sproutventory[t].clingTo.capped = 1
+                            }else{
+                                this.sproutventory[t].clingTo.capped = 0
+                                if (omegahash[`${this.sproutventory[t].clingTo.k}`].carriers >= ((1 / this.sproutventory[t].clingTo.weight) * 2)-1) {
+                                this.sproutventory[t].hittime = 1
+                                this.sproutventory[t].clingTo.capped = 1
+                                }
                             }
                             omegahash[`${this.sproutventory[t].clingTo.k}`].carriers++
                             if (this.sproutventory[t].type == 0) {
@@ -6348,6 +6362,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             }
                             // //console.log(this.sproutventory[t].clingTo.k, omegahash[`${this.sproutventory[t].clingTo.k}`])
                         } else {
+                            this.sproutventory[t].clingTo.capped = 0
                             let obj = {}
                             this.sproutventory[t].smartpath()
                             obj.carriers = 1
