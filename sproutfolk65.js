@@ -5460,8 +5460,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
             nodespecial.equity = new CircleS(8761, 6195, 660, "Red")
             nodespecial.big = new CircleS(8761, 6195, 200, "Red")
 
+            let nodespecial2 = new CircleS(700, 9700, 600, "Red")
+            nodespecial2.priority = 100 //this.nodemap[t].z //- (t/100000)
+            // //console.log(t,node.priority)
+            nodespecial2.small = new CircleS(8761, 6195, 20, "Red")
+            nodespecial2.equity = new CircleS(8761, 6195, 660, "Red")
+            nodespecial2.big = new CircleS(8761, 6195, 200, "Red")
 
-            this.nodes = [nodespecial]
+            this.nodes = [nodespecial, nodespecial2]
             for (let t = 0; t < this.nodemap.length; t++) {
                 let node = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 600, "Red")
                 node.priority = this.nodemap[t].z //- (t/100000)
@@ -6575,7 +6581,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
                 // this.sproutventory[t].body.frictiveMove()
                 if (keysPressed['o'] || keysPressed['e'] || gamepadAPI.buttonsStatus.includes('A') || gamepadAPI.buttonsStatus.includes('Left-Trigger')) {
-                    if (length < this.supersize) {
+                    if (length < (this.supersize*2.2)) {
                         if (this.sproutventory[t].grounded == 1) {
                             this.sproutventory[t].grounded = -3
                             this.sproutventory[t].attent = 1
