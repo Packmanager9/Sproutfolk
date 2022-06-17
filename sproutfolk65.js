@@ -5341,6 +5341,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const boidpart = new Image()
     boidpart.src = "boidpart.png"
     canvas_context.drawImage(boidpart,0,0)
+    const combatpart = new Image()
+    combatpart.src = "combatpart.png"
+    canvas_context.drawImage(combatpart,0,0)
 // console.log(clockwork.width)
     // while(clockwork.width <= 0){
     //     canvas_context.drawImage(clockwork,0,0)
@@ -5403,6 +5406,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             if(this.type == 13){
                 this.weight = 169
+            }
+            if(this.type == 14){
+                this.weight = 100
             }
             this.body.weight = 1 / this.weight
             this.body.timer = 999999999999 * 999999999999
@@ -5503,6 +5509,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.drawn++
                 // this.step+=4
                 canvas_context.drawImage(boidpart, (this.step % 684) * (boidpart.width / 684), 0, boidpart.width / 684, boidpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 14) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(combatpart, (this.step % 730) * (combatpart.width / 730), 0, combatpart.width / 730, combatpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             
             if (throbert.body.doesPerimeterTouch(this.body)) {
@@ -6044,6 +6055,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 boider.body.color = "#AAFFAA"
                 boider.body.radius = 35
                 this.enemies.push(boider)
+
+                const comber = new Part(9000, 6000,  14)
+                comber.body.color = "#090919"
+                comber.body.radius = 40
+                this.enemies.push(comber)
 
                 
                
