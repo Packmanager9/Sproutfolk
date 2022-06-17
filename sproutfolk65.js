@@ -2034,7 +2034,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.cursorline = new LineOPD(TIP_engine, this.body)
             this.body.friction = .8
             this.grounded = 1
-            this.supersize = 9
+            this.supersize = 12 //9
             this.playlink = new LineOPD(this.body, throbert.body)
             this.camplink = new LineOPD(this.body, throbert.c1)
             this.links = []
@@ -2314,7 +2314,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.body.symom *= .8
                 }
             }
-            if (this.playlink.hypotenuse() > 600) {
+            if (this.playlink.hypotenuse() > 720) { //600
                 this.attent = 0
             }
             this.hittime++
@@ -2508,8 +2508,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             }
                         }
 
-                        this.playlink = new LineOP(this.body, throbert.body)
-                        if (this.playlink.hypotenuse() < 190) {
+                        // this.playlink = new LineOPD(this.body, throbert.body)
+                        if (this.playlink.hypotenuse() < 300) { //190?
                             this.attent = 1
                         } else {
                             this.attent = -109
@@ -2685,8 +2685,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.ycord = Math.min(this.ycord, 10230)
                     // ////console.log(this.xcord, this.ycord)
                     if (throbert.road[`${this.xcord},${this.ycord}`].doesPerimeterTouch(this.body)) {
-                        for (let t = Math.max(this.xcord - ten, 0); t < Math.min(this.xcord + 20, 10230); t += ten) {
-                            for (let k = Math.max(this.ycord - ten, 0); k < Math.min(this.ycord + 20, 10230); k += ten) {
+                        for (let t = Math.max(this.xcord - 50, 0); t < Math.min(this.xcord + 60, 10230); t += ten) {
+                            for (let k = Math.max(this.ycord - 50, 0); k < Math.min(this.ycord + 60, 10230); k += ten) {
 
                                 const link = new LineOPD(this.body, throbert.road[`${t},${k}`])
 
@@ -3128,8 +3128,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.ycord = Math.min(this.ycord, 10230)
                     // ////console.log(this.xcord, this.ycord)
                     if (throbert.road[`${this.xcord},${this.ycord}`].doesPerimeterTouch(this.body)) {
-                        for (let t = Math.max(this.xcord - ten, 0); t < Math.min(this.xcord + 20, 10230); t += ten) {
-                            for (let k = Math.max(this.ycord - ten, 0); k < Math.min(this.ycord + 20, 10230); k += ten) {
+                        for (let t = Math.max(this.xcord - 50, 0); t < Math.min(this.xcord + 60, 10230); t += ten) {
+                            for (let k = Math.max(this.ycord - 50, 0); k < Math.min(this.ycord + 60, 10230); k += ten) {
 
                                 const link = new LineOPD(this.body, throbert.road[`${t},${k}`])
 
@@ -5267,6 +5267,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
     function empty() {
     }
 
+
+
     const shotspritem = new Image()
     shotspritem.src = "shotspritem.png"
     const shotspritey = new Image()
@@ -5299,6 +5301,54 @@ window.addEventListener('DOMContentLoaded', (event) => {
     doodlec.src = "doodlec.png"
     const gearsheet = new Image()
     gearsheet.src = "enginesheet.png"
+    canvas_context.drawImage(gearsheet,0,0)
+    const spinbox = new Image()
+    spinbox.src = "spinbox.png"
+    canvas_context.drawImage(spinbox,0,0)
+    const orbpartsheet = new Image()
+    orbpartsheet.src = "orbpartsheet.png"
+    canvas_context.drawImage(orbpartsheet,0,0)
+    const snakepart = new Image()
+    snakepart.src = "snakepart.png"
+    canvas_context.drawImage(snakepart,0,0)
+    const bubblepart = new Image()
+    bubblepart.src = "bubblepart.png"
+    canvas_context.drawImage(bubblepart,0,0)
+    const clockwork = new Image()
+    clockwork.src = "clocksmall.png"
+    canvas_context.drawImage(clockwork,0,0)
+    const harmlessdisarmerpart = new Image()
+    harmlessdisarmerpart.src = "harmlessdisarmerpartinv.png"
+    canvas_context.drawImage(gearsheet,0,0)
+    const rainbowfuelpart = new Image()
+    rainbowfuelpart.src = "fuelout.png"
+    canvas_context.drawImage(rainbowfuelpart,0,0)
+    const warjarpart = new Image()
+    warjarpart.src = "warjar.png"
+    canvas_context.drawImage(warjarpart,0,0)
+    const brainpart = new Image()
+    brainpart.src = "brainpart.png"
+    canvas_context.drawImage(brainpart,0,0)
+    const mirrorpart = new Image()
+    mirrorpart.src = "mirrorpart2.png"
+    canvas_context.drawImage(mirrorpart,0,0)
+    const radar = new Image()
+    radar.src = "radarpart.png"
+    canvas_context.drawImage(radar,0,0)
+    const drive = new Image()
+    drive.src = "drivepart.png"
+    canvas_context.drawImage(drive,0,0)
+    const boidpart = new Image()
+    boidpart.src = "boidpart.png"
+    canvas_context.drawImage(boidpart,0,0)
+// console.log(clockwork.width)
+    // while(clockwork.width <= 0){
+    //     canvas_context.drawImage(clockwork,0,0)
+    // }
+
+
+
+
     class Part {
         constructor(x, y, type) {
             this.healthbar = new Rectangle(0, 0, 0, 0, "red")
@@ -5310,7 +5360,50 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.health = 0
             this.maxhealth = 100000
             this.body.health = this.health
-            this.weight = 400
+            this.drawn = 0
+
+            if(this.type == 0){
+                this.weight = 400
+            }
+            if(this.type == 1){
+                this.weight = 180
+            }
+            if(this.type == 2){
+                this.weight = 50
+            }
+            if(this.type == 3){
+                this.weight = 123
+            }
+            if(this.type == 4){
+                this.weight = 321
+            }
+            if(this.type == 5){
+                this.weight = 71
+            }
+            if(this.type == 6){
+                this.weight = 300
+            }
+            if(this.type == 7){
+                this.weight = 59
+            }
+            if(this.type == 8){
+                this.weight = 590
+            }
+            if(this.type == 9){
+                this.weight = 140
+            }
+            if(this.type == 10){
+                this.weight = 69
+            }
+            if(this.type == 11){
+                this.weight = 42
+            }
+            if(this.type == 12){
+                this.weight = 74
+            }
+            if(this.type == 13){
+                this.weight = 169
+            }
             this.body.weight = 1 / this.weight
             this.body.timer = 999999999999 * 999999999999
         }
@@ -5328,7 +5421,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
         draw() {
-            if (this.playlink.hypotenuse() > 740) {
+            if (this.playlink.hypotenuse() > 740 && this.drawn >= 100) {
                 return
             }
             if (this.health <= 0) {
@@ -5342,9 +5435,76 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.body.draw()
             this.step++
             if (this.type == 0) {
+                this.drawn++
                 canvas_context.drawImage(gearsheet, (this.step % 305) * (gearsheet.width / 305), 0, gearsheet.width / 305, gearsheet.height, this.body.x - this.body.radius, this.body.y - this.body.radius, this.body.radius * 2, this.body.radius * 2)
             }
 
+            if (this.type == 1) {
+                this.drawn++
+                canvas_context.drawImage(spinbox, (this.step % 524) * (spinbox.width / 524), 0, spinbox.width / 524, spinbox.height, this.body.x - this.body.radius, this.body.y - this.body.radius, this.body.radius * 2, this.body.radius * 2)
+            }
+
+            if (this.type == 2) {
+                this.drawn++
+                canvas_context.drawImage(orbpartsheet, (this.step % 606) * (orbpartsheet.width / 606), 0, orbpartsheet.width / 606, orbpartsheet.height, this.body.x - this.body.radius, this.body.y - this.body.radius, this.body.radius * 2, this.body.radius * 2)
+            }
+
+            if (this.type == 3) {
+                this.drawn++
+                canvas_context.drawImage(snakepart, (this.step % 1126) * (snakepart.width / 1126), 0, snakepart.width / 1126, snakepart.height, this.body.x - (this.body.radius*.9), this.body.y - (this.body.radius*.9), this.body.radius * 1.8, this.body.radius * 1.8)
+            }
+
+            if (this.type == 4) {
+                this.drawn++
+                canvas_context.drawImage(bubblepart, (this.step % 323) * (bubblepart.width / 323), 0, bubblepart.width / 323, bubblepart.height, this.body.x - (this.body.radius), this.body.y - (this.body.radius), this.body.radius * 2, this.body.radius * 2)
+            }
+
+            if (this.type == 5) {
+                this.drawn++
+                canvas_context.drawImage(harmlessdisarmerpart, (this.step % 71) * (harmlessdisarmerpart.width / 71), 0, harmlessdisarmerpart.width / 71, harmlessdisarmerpart.height, this.body.x - (this.body.radius*2), this.body.y - (this.body.radius*2), this.body.radius * 4, this.body.radius * 4)
+            }
+
+            if (this.type == 6) {
+                this.drawn++
+                // this.step+=11
+                canvas_context.drawImage(rainbowfuelpart, (this.step % 896) * (rainbowfuelpart.width / 896), 0, rainbowfuelpart.width / 896, rainbowfuelpart.height, this.body.x - (this.body.radius*1), this.body.y - (this.body.radius*1), this.body.radius * 2, this.body.radius * 2)
+            }
+            if (this.type == 7) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(clockwork, (this.step % 355) * (clockwork.width / 355), 0, clockwork.width / 355, clockwork.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 8) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(warjarpart, (this.step % 1902) * (warjarpart.width / 1902), 0, warjarpart.width / 1902, warjarpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 9) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(brainpart, (this.step % 1128) * (brainpart.width / 1128), 0, brainpart.width / 1128, brainpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 10) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(mirrorpart, (this.step % 244) * (mirrorpart.width / 244), 0, mirrorpart.width / 244, mirrorpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 11) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(radar, (this.step % 104) * (radar.width / 104), 0, radar.width / 104, radar.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 12) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(drive, (this.step % 326) * (drive.width / 326), 0, drive.width / 326, drive.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 13) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(boidpart, (this.step % 684) * (boidpart.width / 684), 0, boidpart.width / 684, boidpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            
             if (throbert.body.doesPerimeterTouch(this.body)) {
                 const angle = this.playlink.angle()
                 throbert.body.xmom -= Math.cos(angle) * 6.1
@@ -5411,7 +5571,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             //     this.nodes[t].priority = ((avg) + (this.nodes[t].priority * 10000)) / 10001
             // }
             // ////console.log(this)
-            this.body = new Circle(5120, 5120, 6, "#090909")
+            this.body = new Circle(5120, 5120, 7, "#090909")
             canvas_context.translate(-(1920 + 2560), -((1920 + 2560) + 300))
             this.seek = new CircleS(5120, 5120, 8, "#FF00FF")
             this.sproutventory = []
@@ -5461,19 +5621,35 @@ window.addEventListener('DOMContentLoaded', (event) => {
             nodespecial.big = new CircleS(8761, 6195, 200, "Red")
 
             let nodespecial2 = new CircleS(700, 9700, 600, "Red")
-            nodespecial2.priority = 100 //this.nodemap[t].z //- (t/100000)
-            // //console.log(t,node.priority)
+            nodespecial2.priority = 100
             nodespecial2.small = new CircleS(700, 9700, 20, "Red")
             nodespecial2.equity = new CircleS(700, 9700, 660, "Red")
             nodespecial2.big = new CircleS(700, 9700, 200, "Red")
             let nodespecial3 = new CircleS(7444, 9756, 600, "Red")
             nodespecial3.priority = 100 //this.nodemap[t].z //- (t/100000)
-            // //console.log(t,node.priority)
             nodespecial3.small = new CircleS(7444, 9756,  20, "Red")
             nodespecial3.equity = new CircleS(7444, 9756, 660, "Red")
             nodespecial3.big = new CircleS(7444, 9756, 200, "Red")
+            let nodespecial4 = new CircleS(300, 9009, 600, "Red")
+            nodespecial4.priority = 99
+            nodespecial4.small = new CircleS(300, 9009, 20, "Red")
+            nodespecial4.equity = new CircleS(300, 9009, 660, "Red")
+            nodespecial4.big = new CircleS(300, 9009, 200, "Red")
 
-            this.nodes = [nodespecial, nodespecial2, nodespecial3]
+            let nodespecial5 = new CircleS(450, 9400, 600, "Red")
+            nodespecial5.priority = 99.5
+            nodespecial5.small = new CircleS(450, 9400, 20, "Red")
+            nodespecial5.equity = new CircleS(450, 9400, 660, "Red")
+            nodespecial5.big = new CircleS(450, 9400, 200, "Red")
+
+            let nodespecial6 = new CircleS(100, 8600, 600, "Red")
+            nodespecial6.priority = 98
+            nodespecial6.small = new CircleS(100, 8600, 20, "Red")
+            nodespecial6.equity = new CircleS(100, 8600, 660, "Red")
+            nodespecial6.big = new CircleS(100, 8600, 200, "Red")
+
+
+            this.nodes = [nodespecial, nodespecial2, nodespecial3, nodespecial4, nodespecial5, nodespecial6]
             for (let t = 0; t < this.nodemap.length; t++) {
                 let node = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 600, "Red")
                 node.priority = this.nodemap[t].z //- (t/100000)
@@ -5795,6 +5971,82 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.first == 0) {
                 this.first = 1
                 this.enemies = [] //[new Gloobleglat(2300, 2660), new Gloobleglat(2560, 2800), new Gloobleglat(2860, 2660), new Gloobleglat(2300 + 900, 2560), new Gloobleglat(2560, 2800 + 900), new Gloobleglat(2860 + 900, 2560 + 900)]
+               
+
+
+                const engine = new Part(4800, 4800, 0)
+                this.enemies.push(engine)
+
+                const rotor = new Part(6500, 6500, 1)
+                rotor.body.color = "#909090"
+                this.enemies.push(rotor)
+
+                const orbpart = new Part(600, 6500, 2)
+                orbpart.body.color = "#FFFF00"
+                this.enemies.push(orbpart)
+
+                const snakepartpart = new Part(4700, 7333, 3)
+                snakepartpart.body.color = "#00AA00"
+                this.enemies.push(snakepartpart)
+
+                const bupplepart = new Part(6472, 1346, 4)
+                bupplepart.body.radius *= .75
+                bupplepart.body.color = "#DDDDDD"
+                this.enemies.push(bupplepart)
+
+                const armpart = new Part(3883, 3223, 5)
+                armpart.body.radius *= .75
+                armpart.body.color = "#FF00AA"
+                this.enemies.push(armpart)
+
+                const fuelpart = new Part(9000, 300, 6)
+                fuelpart.body.color = "#000000"
+                fuelpart.body.radius *= .75
+                this.enemies.push(fuelpart)
+
+                const clockpart =new Part(5200, 4143, 7)
+                clockpart.body.color = "#FFFFFF"
+                // clockpart.body.radius *= .75
+                clockpart.body.radius *= 2
+                this.enemies.push(clockpart)
+
+                const warjar = new Part(6200, 9200, 8)
+                warjar.body.color = "#8844FF"
+                warjar.body.radius *= 2
+                this.enemies.push(warjar)
+
+
+                const brainjar = new Part(4467, 6529,  9)
+                brainjar.body.color = "#FF8844"
+                this.enemies.push(brainjar)
+
+
+                const mirrorjar = new Part(9000, 9000,  10)
+                mirrorjar.body.color = "#090909"
+                mirrorjar.body.radius = 39
+                this.enemies.push(mirrorjar)
+
+
+
+                const radarpart =  new Part(1111, 1111,  11)
+                radarpart.body.color = "#FFFFFF"
+                radarpart.body.radius = 35
+                this.enemies.push(radarpart)
+
+
+
+                const drivepart = new Part(8100, 6900,  12)
+                drivepart.body.color = "#00DD55"
+                drivepart.body.radius = 25
+                this.enemies.push(drivepart)
+
+                const boider = new Part(1450, 9500,  13)
+                boider.body.color = "#AAFFAA"
+                boider.body.radius = 35
+                this.enemies.push(boider)
+
+                
+               
                 for (let t = 0; t < 8; t++) {
                     const plug = new Crab(3200 + ((Math.random() - .5) * 400), 3200 + ((Math.random() - .5) * 400), ['red', "magenta", "orange"])
                     plug.body.x *= 2
@@ -5888,10 +6140,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 // crabboss.body.y *= 2
                 this.enemies.push(stomplegs)
 
-
-
-                const engine = new Part(4800, 4800, 0)
-                this.enemies.push(engine)
 
                 for (let k = 0; k < this.enemies.length; k++) {
                     this.enemies[k].body.supralinks = []
@@ -6072,6 +6320,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 gamepad_control(this.body, 6)
             }
             this.body.friction = 0.15
+
+            if(this.health <= 0){
+
+                this.health = 0
+                this.body.xmom += Math.cos(this.playlink.angle())*20
+                this.body.ymom += Math.sin(this.playlink.angle())*20
+                if(this.c3.doesPerimeterTouch(this.body)){
+                    this.health = this.maxhealth
+                }else{
+                    this.body.frictiveMove()
+                }
+            }
             for (let x = 0; x < 20; x++) {
                 this.body.frictiveMove10(1)
                 this.xcord = Math.floor((this.body.x) * .1) * ten
@@ -6149,11 +6409,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
             ydiff = ydiff - this.body.y
             this.seek.x = this.body.x + this.seekx
             this.seek.y = this.body.y + this.seeky
-            this.seekline = new LineOP(this.seek, this.body, "magenta",)
+            this.seekline = new LineOP(this.seek, this.body, "magenta", 1)
+            this.angf = this.seekline.angle()
 
-            this.seekline.draw()
+            this.pointeredge = new PointD(this.seek.x-(Math.cos(this.angf)*this.seek.radius), this.seek.y-(Math.sin(this.angf)*this.seek.radius))
 
-            this.seekline.draw()
+
+            this.seeklineedge = new LineOP(this.pointeredge, this.body, "magenta", 2)
+
+            if(this.seek.doesPerimeterTouch(this.body)){
+
+            }else{
+                this.seeklineedge.draw()
+            }
+
+            // this.seekline.draw()
             this.seek.draw()
 
             // canvas_context.drawImage(this.captain, 0, 0, this.captain.width, this.captain.height, this.body.x - this.body.radius, this.body.y - this.body.radius, 2 * this.body.radius, 2 * this.body.radius)
@@ -6404,16 +6674,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         if (keysPressed[' '] || Math.abs(gamepadAPI.axesStatus[2]) > 0.09 || Math.abs(gamepadAPI.axesStatus[3]) > 0.09) {
                             this.grab = -3
 
-                            let link = new LineOP(throbert.body, throbert.seek)
+                            // let link = new LineOP(throbert.body, throbert.seek)
                             if (this.sproutventory[t].type == 2) {
-                                this.sproutventory[t].body.xmom = -(Math.cos(link.angle()) * 41.2)// (gamepadAPI.axesStatus[2] * 1) * 31.3
-                                this.sproutventory[t].body.ymom = -(Math.sin(link.angle()) * 41.2)//(gamepadAPI.axesStatus[3] * 1) * 31.3
+                                this.sproutventory[t].body.xmom = (Math.cos(this.angf) * 41.2)// (gamepadAPI.axesStatus[2] * 1) * 31.3
+                                this.sproutventory[t].body.ymom = (Math.sin(this.angf) * 41.2)//(gamepadAPI.axesStatus[3] * 1) * 31.3
                                 this.sproutventory[t].grab = 0
                                 this.sproutventory[t].fly = 20
                             } else {
 
-                                this.sproutventory[t].body.xmom = -(Math.cos(link.angle()) * 31.2)// (gamepadAPI.axesStatus[2] * 1) * 31.3
-                                this.sproutventory[t].body.ymom = -(Math.sin(link.angle()) * 31.2)//(gamepadAPI.axesStatus[3] * 1) * 31.3
+                                this.sproutventory[t].body.xmom = (Math.cos(this.angf) * 31.2)// (gamepadAPI.axesStatus[2] * 1) * 31.3
+                                this.sproutventory[t].body.ymom = (Math.sin(this.angf) * 31.2)//(gamepadAPI.axesStatus[3] * 1) * 31.3
                                 this.sproutventory[t].grab = 0
                                 this.sproutventory[t].fly = 16
                             }
@@ -6421,7 +6691,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     }
                 }
                 if (this.sproutventory[t].grounded != 1 && this.sproutventory[t].fly <= 0 && this.sproutventory[t].hittime % 3 == 0) {
-                    for (let k = t; k < this.sproutventory.length; k++) {
+                    for (let k = Math.max(t-1,0); k < this.sproutventory.length; k++) {  //not t? 0?
                         if (this.sproutventory[k].grounded != 1) {
                             if (this.sproutventory[k].attent == 1) {
 
@@ -6435,9 +6705,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                                     this.sproutventory[t].attent = 1
                                                 }
                                             } else {
-                                                if (this.sproutventory[t].playlink.hypotenuse() < 290) {
+                                                // if (this.sproutventory[t].playlink.hypotenuse() < 750) { //290???? does the other one even fire now that k = t?
                                                     this.sproutventory[t].attent = 1
-                                                }
+                                                // }
                                             }
                                         }
                                         if (this.sproutventory[t].type != this.sproutventory[k].type) {
@@ -6461,9 +6731,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                                     this.sproutventory[t].attent = 1
                                                 }
                                             } else {
-                                                if (this.sproutventory[t].playlink.hypotenuse() < 290) {
+                                                // if (this.sproutventory[t].playlink.hypotenuse() < 750) { //290????
                                                     this.sproutventory[t].attent = 1
-                                                }
+                                                // }
                                             }
                                         }
                                         if (this.sproutventory[t].type != this.sproutventory[k].type) {
@@ -6521,11 +6791,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                             if (Math.abs(gamepadAPI.axesStatus[2]) > 0.09 || Math.abs(gamepadAPI.axesStatus[3]) > 0.09 || this.ijklflag == 1) {
                                                 if (this.ijklflag == 1) {
                                                     if (!keysPressed[' ']) {
-                                                        this.sproutventory[t].body.xmom += Math.cos(this.seekline.angle()) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
-                                                        this.sproutventory[t].body.ymom += Math.sin(this.seekline.angle()) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
+                                                        this.sproutventory[t].body.xmom += Math.cos(this.angf) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
+                                                        this.sproutventory[t].body.ymom += Math.sin(this.angf) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
                                                         if (this.sproutventory[t].type == 0) {
-                                                            this.sproutventory[t].body.xmom += Math.cos(this.seekline.angle()) * .1 * (1 + (this.sproutventory[t].bloom * .2))
-                                                            this.sproutventory[t].body.ymom += Math.sin(this.seekline.angle()) * .1 * (1 + (this.sproutventory[t].bloom * .2))
+                                                            this.sproutventory[t].body.xmom += Math.cos(this.angf) * .1 * (1 + (this.sproutventory[t].bloom * .2))
+                                                            this.sproutventory[t].body.ymom += Math.sin(this.angf) * .1 * (1 + (this.sproutventory[t].bloom * .2))
                                                         }
                                                     }
                                                 } else {
@@ -6556,11 +6826,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                         if (Math.abs(gamepadAPI.axesStatus[2]) > 0.09 || Math.abs(gamepadAPI.axesStatus[3]) > 0.09 || this.ijklflag == 1 || this.guiding == 1) {
                                             if (this.ijklflag == 1) {
                                                 if (!keysPressed[' ']) {
-                                                    this.sproutventory[t].body.xmom += Math.cos(this.seekline.angle()) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
-                                                    this.sproutventory[t].body.ymom += Math.sin(this.seekline.angle()) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
+                                                    this.sproutventory[t].body.xmom += Math.cos(this.angf) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
+                                                    this.sproutventory[t].body.ymom += Math.sin(this.angf) * 2.2 * (1 + (this.sproutventory[t].bloom * .2))
                                                     if (this.sproutventory[t].type == 0) {
-                                                        this.sproutventory[t].body.xmom += Math.cos(this.seekline.angle()) * .1 * (1 + (this.sproutventory[t].bloom * .2))
-                                                        this.sproutventory[t].body.ymom += Math.sin(this.seekline.angle()) * .1 * (1 + (this.sproutventory[t].bloom * .2))
+                                                        this.sproutventory[t].body.xmom += Math.cos(this.angf) * .1 * (1 + (this.sproutventory[t].bloom * .2))
+                                                        this.sproutventory[t].body.ymom += Math.sin(this.angf) * .1 * (1 + (this.sproutventory[t].bloom * .2))
                                                     }
                                                 }
                                             } else if (this.guiding == 1) {
