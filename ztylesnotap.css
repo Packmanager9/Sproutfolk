@@ -1,0 +1,7 @@
+/* General Styles */
+.disable-dbl-tap-zoom {
+  touch-action: manipulation;
+}
+body {
+  touch-action: manipulation;
+}
