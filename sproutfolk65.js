@@ -47,99 +47,99 @@ window.addEventListener('DOMContentLoaded', (event) => {
     let airmail = {}
     airmail.x = 0
     airmail.y = 0
-    // function CanvasCaptureToWEBM(canvas, bitrate) {
-    //     // the video_recorder is set to  '= new CanvasCaptureToWEBM(canvas, 4500000);' in the setup, 
-    //     // it uses the same canvas as the rest of the file.
-    //     // to start a recording call .record() on video_recorder
-    //     /*
-    //     for example, 
-    //     if(keysPressed['-'] && recording == 0){
-    //         recording = 1
-    //         video_recorder.record()
-    //     }
-    //     if(keysPressed['='] && recording == 1){
-    //         recording = 0
-    //         video_recorder.stop()
-    //         video_recorder.download('File Name As A String.webm')
-    //     }
-    //     */
-    //     this.record = Record
-    //     this.stop = Stop
-    //     this.download = saveToDownloads
-    //     let blobCaptures = []
-    //     let outputFormat = {}
-    //     let recorder = {}
-    //     let canvasInput = canvas.captureStream()
-    //     if (typeof canvasInput == undefined || !canvasInput) {
-    //         return
-    //     }
-    //     const video = document.createElement('video')
-    //     video.style.display = 'none'
+    function CanvasCaptureToWEBM(canvas, bitrate) {
+        // the video_recorder is set to  '= new CanvasCaptureToWEBM(canvas, 4500000);' in the setup, 
+        // it uses the same canvas as the rest of the file.
+        // to start a recording call .record() on video_recorder
+        /*
+        for example, 
+        if(keysPressed['-'] && recording == 0){
+            recording = 1
+            video_recorder.record()
+        }
+        if(keysPressed['='] && recording == 1){
+            recording = 0
+            video_recorder.stop()
+            video_recorder.download('File Name As A String.webm')
+        }
+        */
+        this.record = Record
+        this.stop = Stop
+        this.download = saveToDownloads
+        let blobCaptures = []
+        let outputFormat = {}
+        let recorder = {}
+        let canvasInput = canvas.captureStream()
+        if (typeof canvasInput == undefined || !canvasInput) {
+            return
+        }
+        const video = document.createElement('video')
+        video.style.display = 'none'
 
-    //     function Record() {
-    //         let formats = [
-    //             "video/webm\;codecs=h264",
-    //             "video/webm\;codecs=vp8",
-    //             'video/vp8',
-    //             "video/webm",
-    //             'video/webm,codecs=vp9',
-    //             "video/webm\;codecs=daala",
-    //             "video/mpeg"
-    //         ];
+        function Record() {
+            let formats = [
+                "video/webm\;codecs=h264",
+                "video/webm\;codecs=vp8",
+                'video/vp8',
+                "video/webm",
+                'video/webm,codecs=vp9',
+                "video/webm\;codecs=daala",
+                "video/mpeg"
+            ];
 
-    //         for (let t = 0; t < formats.length; t++) {
-    //             if (MediaRecorder.isTypeSupported(formats[t])) {
-    //                 outputFormat = formats[t]
-    //                 break
-    //             }
-    //         }
-    //         if (typeof outputFormat != "string") {
-    //             return
-    //         } else {
-    //             let videoSettings = {
-    //                 mimeType: outputFormat,
-    //                 videoBitsPerSecond: bitrate || 2000000 // 2Mbps
-    //             };
-    //             blobCaptures = []
-    //             try {
-    //                 recorder = new MediaRecorder(canvasInput, videoSettings)
-    //             } catch (error) {
-    //                 return;
-    //             }
-    //             recorder.onstop = handleStop
-    //             recorder.ondataavailable = handleAvailableData
-    //             recorder.start(100)
-    //         }
-    //     }
-    //     function handleAvailableData(event) {
-    //         if (event.data && event.data.size > 0) {
-    //             blobCaptures.push(event.data)
-    //         }
-    //     }
-    //     function handleStop() {
-    //         const superBuffer = new Blob(blobCaptures, { type: outputFormat })
-    //         video.src = window.URL.createObjectURL(superBuffer)
-    //     }
-    //     function Stop() {
-    //         recorder.stop()
-    //         video.controls = true
-    //     }
-    //     function saveToDownloads(input) { // specifying a file name for the output
-    //         const name = input || 'video_out.webm'
-    //         const blob = new Blob(blobCaptures, { type: outputFormat })
-    //         const url = window.URL.createObjectURL(blob)
-    //         const storageElement = document.createElement('a')
-    //         storageElement.style.display = 'none'
-    //         storageElement.href = url
-    //         storageElement.download = name
-    //         document.body.appendChild(storageElement)
-    //         storageElement.click()
-    //         setTimeout(() => {
-    //             document.body.removeChild(storageElement)
-    //             window.URL.revokeObjectURL(url)
-    //         }, 100)
-    //     }
-    // }
+            for (let t = 0; t < formats.length; t++) {
+                if (MediaRecorder.isTypeSupported(formats[t])) {
+                    outputFormat = formats[t]
+                    break
+                }
+            }
+            if (typeof outputFormat != "string") {
+                return
+            } else {
+                let videoSettings = {
+                    mimeType: outputFormat,
+                    videoBitsPerSecond: bitrate || 2000000 // 2Mbps
+                };
+                blobCaptures = []
+                try {
+                    recorder = new MediaRecorder(canvasInput, videoSettings)
+                } catch (error) {
+                    return;
+                }
+                recorder.onstop = handleStop
+                recorder.ondataavailable = handleAvailableData
+                recorder.start(100)
+            }
+        }
+        function handleAvailableData(event) {
+            if (event.data && event.data.size > 0) {
+                blobCaptures.push(event.data)
+            }
+        }
+        function handleStop() {
+            const superBuffer = new Blob(blobCaptures, { type: outputFormat })
+            video.src = window.URL.createObjectURL(superBuffer)
+        }
+        function Stop() {
+            recorder.stop()
+            video.controls = true
+        }
+        function saveToDownloads(input) { // specifying a file name for the output
+            const name = input || 'video_out.webm'
+            const blob = new Blob(blobCaptures, { type: outputFormat })
+            const url = window.URL.createObjectURL(blob)
+            const storageElement = document.createElement('a')
+            storageElement.style.display = 'none'
+            storageElement.href = url
+            storageElement.download = name
+            document.body.appendChild(storageElement)
+            storageElement.click()
+            setTimeout(() => {
+                document.body.removeChild(storageElement)
+                window.URL.revokeObjectURL(url)
+            }, 100)
+        }
+    }
     const gamepadAPI = {
         controller: {},
         turbo: true,
@@ -1635,7 +1635,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
     function setUp(canvas_pass, style = "#000055") {
         canvas = canvas_pass
-        // video_recorder = new CanvasCaptureToWEBM(canvas, 2500000);
+        video_recorder = new CanvasCaptureToWEBM(canvas, 3000000);
         canvas_context = canvas.getContext('2d');
         // canvas_context.imageSmoothingEnabled = true
         canvas.style.background = style
@@ -2321,6 +2321,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.bloomdriptimer--
 
             this.vsum = 0
+            this.vmax = -9999
+            this.vmin = 9999
             if (this.ignore != 1) {
                 this.xcord = Math.floor((this.body.x) * .1) * 10
                 this.xcord = Math.max(this.xcord, 0)
@@ -2328,16 +2330,24 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.ycord = Math.floor((this.body.y) * .1) * 10
                 this.ycord = Math.max(this.ycord, 0)
                 this.ycord = Math.min(this.ycord, 10230)
+
+            this.vmax = throbert.road[`${this.xcord},${this.ycord}`].z
+            this.vmin = throbert.road[`${this.xcord},${this.ycord}`].z
                 for (let t = Math.max(this.xcord - 20, 0); t < Math.min(this.xcord + 30, 10230); t += ten) {
                     for (let k = Math.max(this.ycord - 20, 0); k < Math.min(this.ycord + 30, 10230); k += ten) {
                         this.vsum += Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z)
+                        if(this.vmax < throbert.road[`${t},${k}`].z){
+                            this.vmax = throbert.road[`${t},${k}`].z
+                        }else if(this.vmin > throbert.road[`${t},${k}`].z){
+                            this.vmin = throbert.road[`${t},${k}`].z
+                        }
                     }
                 }
             }
-            if (this.ignore == 1 || this.vsum <= .05) {
+            if (this.ignore == 1 || this.vsum <= .05 || Math.abs(this.vmax-this.vmin) < .2) {
                 this.body.frictiveMove()
             } else {
-                const mag = Math.max(((Math.abs(this.body.xmom) + Math.abs(this.body.ymom))), 2)
+                const mag = Math.max(((Math.abs(this.body.xmom) + Math.abs(this.body.ymom)))*1.5, 3)
                 if (mag > 0) {
                     const stepper = 1 / mag
                     for (let x = 0; x < mag; x++) {
@@ -5344,6 +5354,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const combatpart = new Image()
     combatpart.src = "combatpart.png"
     canvas_context.drawImage(combatpart,0,0)
+    const labpartsmall = new Image()
+    labpartsmall.src = "labpartsmall.png"
+    canvas_context.drawImage(labpartsmall,0,0)
+    const fuellinepart = new Image()
+    fuellinepart.src = "fuellinepart.png"
+    canvas_context.drawImage(labpartsmall,0,0)
 // console.log(clockwork.width)
     // while(clockwork.width <= 0){
     //     canvas_context.drawImage(clockwork,0,0)
@@ -5409,6 +5425,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             if(this.type == 14){
                 this.weight = 100
+            }
+            if(this.type == 15){
+                this.weight = 60
+            }
+            if(this.type == 16){
+                this.weight = 256
             }
             this.body.weight = 1 / this.weight
             this.body.timer = 999999999999 * 999999999999
@@ -5514,6 +5536,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.drawn++
                 // this.step+=4
                 canvas_context.drawImage(combatpart, (this.step % 730) * (combatpart.width / 730), 0, combatpart.width / 730, combatpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 15) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(labpartsmall, (this.step % 910) * (labpartsmall.width / 910), 0, labpartsmall.width / 910, labpartsmall.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 16) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(fuellinepart, (this.step % 910) * (fuellinepart.width / 910), 0, fuellinepart.width / 910, fuellinepart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             
             if (throbert.body.doesPerimeterTouch(this.body)) {
@@ -5659,8 +5691,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
             nodespecial6.equity = new CircleS(100, 8600, 660, "Red")
             nodespecial6.big = new CircleS(100, 8600, 200, "Red")
 
+            let nodespecial7 = new CircleS(6951, 9483, 600, "Red")
+            nodespecial7.priority = 12
+            nodespecial7.small = new CircleS(6951, 9483, 20, "Red")
+            nodespecial7.equity = new CircleS(6951, 9483, 660, "Red")
+            nodespecial7.big = new CircleS(6951, 9483, 200, "Red")
 
-            this.nodes = [nodespecial, nodespecial2, nodespecial3, nodespecial4, nodespecial5, nodespecial6]
+            let nodespecial8 = new CircleS(7148, 9257, 600, "Red")
+            nodespecial8.priority = 13
+            nodespecial8.small = new CircleS(7148, 9257, 20, "Red")
+            nodespecial8.equity = new CircleS(7148, 9257, 660, "Red")
+            nodespecial8.big = new CircleS(7148, 9257, 200, "Red")
+
+
+            this.nodes = [nodespecial, nodespecial2, nodespecial3, nodespecial4, nodespecial5, nodespecial6, nodespecial7, nodespecial8]
             for (let t = 0; t < this.nodemap.length; t++) {
                 let node = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 600, "Red")
                 node.priority = this.nodemap[t].z //- (t/100000)
@@ -6061,6 +6105,28 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 comber.body.radius = 40
                 this.enemies.push(comber)
 
+                const labb = new Part(7100, 3000,  15)
+                labb.body.color = "#090919"
+                labb.body.radius = 25
+                this.enemies.push(labb)
+
+                const fuleline = new Part(7200, 9800,  16)
+                fuleline.body.color = "#FFFFFF"
+                fuleline.body.radius = 25
+                this.enemies.push(fuleline)
+                // let mod = 5
+                // let x = 4600
+                // let y = 4600
+                // for(let t = 0;t<this.enemies.length;t++){
+
+                //     if(t%5 == 0 && t>0){
+                //         x = 4600
+                //         y+=150
+                //     }
+                //     this.enemies[t].body.x = x
+                //     this.enemies[t].body.y = y
+                //     x+=150
+                // }
                 
                
                 for (let t = 0; t < 8; t++) {
@@ -7067,16 +7133,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
         canvas_context.clearRect(-1000000, -1000000, canvas.width * 10000000, canvas.height * 10000000)
         gamepadAPI.update()
         throbert.draw()
-        if (keysPressed['-'] && recording == 0) {
-            recording = 1
-            video_recorder.record()
-            keysPressed = {}
-        }
-        if (keysPressed['='] && recording == 1) {
-            recording = 0
-            video_recorder.stop()
-            video_recorder.download('File Name As A String.webm')
-        }
+        // if (keysPressed['-'] && recording == 0) {
+        //     recording = 1
+        //     video_recorder.record()
+        //     keysPressed = {}
+        // }
+        // if (keysPressed['='] && recording == 1) {
+        //     recording = 0
+        //     video_recorder.stop()
+        //     video_recorder.download('Warm.webm')
+        // }
     }
 
 

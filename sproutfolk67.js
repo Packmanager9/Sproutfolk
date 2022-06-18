@@ -2301,6 +2301,24 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
 
         draw() {
+
+            if(throbert.haspicked <= 1){
+                canvas_context.fillStyle = "white"
+                canvas_context.font = "11px arial"
+                if(this.body.y > throbert.c1.y){
+                    if(this.body.x > throbert.c1.x){
+                    canvas_context.fillText("Pick me!",( this.body.x-(canvas_context.measureText("Pick Me!").width*.5))+5, this.body.y+13)
+                    }else{
+                        canvas_context.fillText("Pick me!", (this.body.x-(canvas_context.measureText("Pick Me!").width*.5))-15, this.body.y+13)
+                    }
+                }else{
+                    if(this.body.x > throbert.c1.x){
+                    canvas_context.fillText("Pick me!", (this.body.x-(canvas_context.measureText("Pick Me!").width*.5))+5, this.body.y-7)
+                    }else{
+                    canvas_context.fillText("Pick me!", (this.body.x-(canvas_context.measureText("Pick Me!").width*.5))-10, this.body.y-7)
+                    }
+                }
+            }
             if (this.fly <= 0) {
                 let brf = 0
                 while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > (globalspeedlimit * 4)) {
@@ -5310,13 +5328,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const doodlec = new Image()
     doodlec.src = "doodlec.png"
     const gearsheet = new Image()
-    gearsheet.src = "enginesheet.png"
+    gearsheet.src = "enginesheet.png" //
     canvas_context.drawImage(gearsheet,0,0)
     const spinbox = new Image()
-    spinbox.src = "spinbox.png"
+    spinbox.src = "spinbox2.png" //
     canvas_context.drawImage(spinbox,0,0)
     const orbpartsheet = new Image()
-    orbpartsheet.src = "orbpartsheet.png"
+    orbpartsheet.src = "orbpartsheet2.png" /// 
     canvas_context.drawImage(orbpartsheet,0,0)
     const snakepart = new Image()
     snakepart.src = "snakepart.png"
@@ -5325,10 +5343,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
     bubblepart.src = "bubblepart.png"
     canvas_context.drawImage(bubblepart,0,0)
     const clockwork = new Image()
-    clockwork.src = "clocksmall.png"
+    clockwork.src = "clocksmall.png"  //
     canvas_context.drawImage(clockwork,0,0)
     const harmlessdisarmerpart = new Image()
-    harmlessdisarmerpart.src = "harmlessdisarmerpartinv.png"
+    harmlessdisarmerpart.src = "harmlessdisarmerpartinv.png" //
     canvas_context.drawImage(gearsheet,0,0)
     const rainbowfuelpart = new Image()
     rainbowfuelpart.src = "fuelout.png"
@@ -5349,17 +5367,56 @@ window.addEventListener('DOMContentLoaded', (event) => {
     drive.src = "drivepart.png"
     canvas_context.drawImage(drive,0,0)
     const boidpart = new Image()
-    boidpart.src = "boidpart.png"
+    boidpart.src = "boidpart2.png" //
     canvas_context.drawImage(boidpart,0,0)
     const combatpart = new Image()
-    combatpart.src = "combatpart.png"
+    combatpart.src = "combatpart2.png"
     canvas_context.drawImage(combatpart,0,0)
     const labpartsmall = new Image()
-    labpartsmall.src = "labpartsmall.png"
+    labpartsmall.src = "labpartsmall.png" //
     canvas_context.drawImage(labpartsmall,0,0)
     const fuellinepart = new Image()
-    fuellinepart.src = "fuellinepart.png"
+    fuellinepart.src = "fuellinepart.png" //
     canvas_context.drawImage(labpartsmall,0,0)
+    const drone985 = new Image()
+    drone985.src = "drone985.png" //
+    canvas_context.drawImage(drone985,0,0)
+    const filterpart = new Image()
+    filterpart.src = "filterpart.png" //
+    canvas_context.drawImage(filterpart,0,0)
+    const holepart = new Image()
+    holepart.src = "holepart.png"
+    canvas_context.drawImage(holepart,0,0)
+    const lamppart = new Image()
+    lamppart.src = "lamppart 2.png"
+    canvas_context.drawImage(lamppart,0,0)
+    const heaterpart = new Image()
+    heaterpart.src = "heaterpart 2.png"
+    canvas_context.drawImage(heaterpart,0,0)
+    const entertainmentpart = new Image()
+    entertainmentpart.src = "entertainmentpart 2.png"
+    canvas_context.drawImage(entertainmentpart,0,0)
+    const waterpart = new Image()
+    waterpart.src = "waterpartx.png"
+    canvas_context.drawImage(waterpart,0,0)
+    const hydroponicspart = new Image()
+    hydroponicspart.src = "hydroponicspartx.png"
+    canvas_context.drawImage(hydroponicspart,0,0)
+    const ammopart = new Image()
+    ammopart.src = "ammopart.png"
+    canvas_context.drawImage(ammopart,0,0)
+    const medbaypart = new Image()
+    medbaypart.src = "medbaypart.png"
+    canvas_context.drawImage(medbaypart,0,0)
+    const proppart = new Image()
+    proppart.src = "proppart.png"
+    canvas_context.drawImage(proppart,0,0)
+    const soundpart = new Image()
+    soundpart.src = "soundpart2.png"
+    canvas_context.drawImage(soundpart,0,0)
+    const tarpart = new Image()
+    tarpart.src = "tarpart2.png"
+    canvas_context.drawImage(tarpart,0,0)
 // console.log(clockwork.width)
     // while(clockwork.width <= 0){
     //     canvas_context.drawImage(clockwork,0,0)
@@ -5431,6 +5488,42 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             if(this.type == 16){
                 this.weight = 256
+            }
+            if(this.type == 17){
+                this.weight = 243
+            }
+            if(this.type == 18){
+                this.weight = 30
+            }
+            if(this.type == 19){
+                this.weight = 109
+            }
+            if(this.type == 21){
+                this.weight = 227
+            }
+            if(this.type == 22){
+                this.weight = 111
+            }
+            if(this.type == 23){
+                this.weight = 40
+            }
+            if(this.type == 24){
+                this.weight = 157
+            }
+            if(this.type == 25){
+                this.weight = 270
+            }
+            if(this.type == 26){
+                this.weight = 77
+            }
+            if(this.type == 27){
+                this.weight = 20
+            }
+            if(this.type == 28){
+                this.weight = 107
+            }
+            if(this.type == 29){
+                this.weight = 166
             }
             this.body.weight = 1 / this.weight
             this.body.timer = 999999999999 * 999999999999
@@ -5547,6 +5640,71 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 // this.step+=4
                 canvas_context.drawImage(fuellinepart, (this.step % 910) * (fuellinepart.width / 910), 0, fuellinepart.width / 910, fuellinepart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
+            if (this.type == 17) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(drone985, (this.step % 985) * (drone985.width / 985), 0, drone985.width / 985, drone985.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 18) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(filterpart, (this.step % 482) * (filterpart.width / 482), 0, filterpart.width / 482, filterpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 19) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(holepart, (this.step % 625) * (holepart.width / 625), 0, holepart.width / 625, holepart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 20) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(lamppart, (this.step % 74) * (lamppart.width / 74), 0, lamppart.width / 74, lamppart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 21) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(heaterpart, (this.step % 525) * (heaterpart.width / 525), 0, heaterpart.width / 525, heaterpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 22) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(entertainmentpart, (this.step % 275) * (entertainmentpart.width / 275), 0, entertainmentpart.width / 275, entertainmentpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 23) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(waterpart, (this.step % 788) * (waterpart.width / 788), 0, waterpart.width / 788, waterpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 24) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(hydroponicspart, (this.step % 335) * (hydroponicspart.width / 335), 0, hydroponicspart.width / 335, hydroponicspart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 25) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(ammopart, (this.step % 504) * (ammopart.width / 504), 0, ammopart.width / 504, ammopart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 26) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(medbaypart, (this.step % 33) * (medbaypart.width / 33), 0, medbaypart.width / 33, medbaypart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 27) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(proppart, (this.step % 806) * (proppart.width / 806), 0, proppart.width / 806, proppart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 28) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(soundpart, (this.step % 396) * (soundpart.width / 396), 0, soundpart.width / 396, soundpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 29) {
+                this.drawn++
+                // this.step+=4
+                canvas_context.drawImage(tarpart, (this.step % 103) * (tarpart.width / 103), 0, tarpart.width / 103, tarpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
             
             if (throbert.body.doesPerimeterTouch(this.body)) {
                 const angle = this.playlink.angle()
@@ -5558,6 +5716,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     class Throbert {
         constructor() {
+            this.haspicked = 0
             this.smack = 0
             this.lmom = 50
             this.kmom = 50
@@ -6084,7 +6243,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 
                 const radarpart =  new Part(1111, 1111,  11)
-                radarpart.body.color = "#FFFFFF"
+                radarpart.body.color = "#000000"
                 radarpart.body.radius = 35
                 this.enemies.push(radarpart)
 
@@ -6114,18 +6273,84 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 fuleline.body.color = "#FFFFFF"
                 fuleline.body.radius = 25
                 this.enemies.push(fuleline)
+
+                const drone = new Part(5120, 9800,  17)
+                drone.body.color = "#090909"
+                drone.body.radius = 41
+                this.enemies.push(drone)
+
+                const filter = new Part(3200, 6000,  18)
+                filter.body.color = "#090909"
+                filter.body.radius = 25
+                this.enemies.push(filter)
+
+                const hole = new Part(5623, 3800,  19)
+                hole.body.color = "#090909"
+                hole.body.radius = 25
+                this.enemies.push(hole)
+
+                const lamp = new Part(4623, 3800,  20)
+                lamp.body.color = "#090909"
+                lamp.body.radius = 25
+                this.enemies.push(lamp)
+
+                const heater = new Part(4200, 7657,  21)
+                heater.body.color = "#FFAA00"
+                heater.body.radius = 25
+                this.enemies.push(heater)
+
+                const tv = new Part(5252, 7512,  22)
+                tv.body.color = "#777777"
+                tv.body.radius = 25
+                this.enemies.push(tv)
+
+                const waterparts = new Part(2800, 8712,  23)
+                waterparts.body.color = "#0000ff"
+                waterparts.body.radius = 32
+                this.enemies.push(waterparts)
+
+                const hydro = new Part(2800, 8012,  24)
+                hydro.body.color = "#00FF00"
+                hydro.body.radius = 20
+                this.enemies.push(hydro)
+
+                const ammo = new Part(6524, 2706,  25)
+                ammo.body.color = "#00FF00"
+                ammo.body.radius = 25
+                this.enemies.push(ammo)
+
+                const heart = new Part(4000, 5038,  26)
+                heart.body.color = "#00FFFF"
+                heart.body.radius = 25
+                this.enemies.push(heart)
+
+                const prop = new Part(1960, 5211,  27)
+                prop.body.color = "#00FFFF00"
+                prop.body.radius = 25
+                this.enemies.push(prop)
+
+                const stereo = new Part(890, 980,  28)
+                stereo.body.color = "#000000"
+                stereo.body.radius = 20
+                this.enemies.push(stereo)
+
+                const target = new Part(1500, 400,  29)
+                target.body.color = "#000000"
+                target.body.radius = 40
+                this.enemies.push(target)
+
                 // let mod = 5
-                // let x = 4600
-                // let y = 4600
+                // let x = 4900
+                // let y = 4400
                 // for(let t = 0;t<this.enemies.length;t++){
 
                 //     if(t%5 == 0 && t>0){
-                //         x = 4600
-                //         y+=150
+                //         x = 4900
+                //         y+=110
                 //     }
                 //     this.enemies[t].body.x = x
                 //     this.enemies[t].body.y = y
-                //     x+=150
+                //     x+=130
                 // }
                 
                
@@ -6950,6 +7175,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 if (keysPressed['o'] || keysPressed['e'] || gamepadAPI.buttonsStatus.includes('A') || gamepadAPI.buttonsStatus.includes('Left-Trigger')) {
                     if (length < (this.supersize*2.2)) {
                         if (this.sproutventory[t].grounded == 1) {
+                            this.haspicked++
                             this.sproutventory[t].grounded = -3
                             this.sproutventory[t].attent = 1
                         } else {
