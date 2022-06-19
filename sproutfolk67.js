@@ -1976,6 +1976,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 
     let setup_canvas = document.getElementById('canvas') //getting canvas from document
+    let megamap = document.getElementById('megamap') //getting canvas from document
+    let megamap_context = megamap.getContext('2d');
     // let textbox = document.getElementById('text') //getting canvas from document
 
     setUp(setup_canvas) // setting up canvas refrences, starting timer. 
@@ -5292,6 +5294,67 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
     }
+
+
+class MenuButton {
+    constructor(x,y,text){
+        canvas_context.font = "20px arial"
+        canvas_context.fillStyle = "white"
+
+        this.h = canvas_context.measureText(text).actualBoundingBoxAscent + canvas_context.measureText(text).actualBoundingBoxDescent
+
+
+        this.x = x
+        this.y = y
+        this.body = new Rectangle(0,0,canvas_context.measureText(text).width+10, this.h+12, "#EE4444dd")
+        this.text = text
+    }
+    draw(){
+        this.body.x = throbert.pause.body.x+this.x
+        this.body.y = throbert.pause.body.y+this.y
+        this.body.draw()
+        canvas_context.font = "20px arial"
+        canvas_context.fillStyle = "white"
+        canvas_context.fillText(this.text, this.body.x+5, this.body.y+this.h+5)
+    }
+}
+
+class PauseMenu {
+    constructor(){
+        this.body = new Rectangle(0,0, 1280, 720, "#0044FF44")
+        this.paused = 0
+        this.buttons = []
+        this.buttons.push(new MenuButton(100,100, "everything is a test to cole" ))
+        this.buttons.push(new MenuButton(100,150, "this is a menu" ))
+        this.buttons.push(new MenuButton(100,200, "..." ))
+        this.buttons.push(new MenuButton(100,250, "JPpjqQ|0{}#1@H8^" ))
+        this.buttons.push(new MenuButton(100,300, "Enemy Encyclopedia" ))
+        this.buttons.push(new MenuButton(100,350, "Part Notes" ))
+        this.buttons.push(new MenuButton(100,400, " " ))
+        this.buttons.push(new MenuButton(100,450, "Player stats" ))
+    }
+    buttons(point){
+
+    }
+    draw(){
+        if(this.paused == 1){
+            this.body = new Rectangle(throbert.body.x-640,throbert.body.y-360, 1280, 720, "#0044FF44")
+            this.body.draw()
+
+        canvas_context.font = "50px arial"
+        canvas_context.fillStyle = "white"
+        canvas_context.fillText("Paused", this.body.x+550, this.body.y+100)
+
+
+            for(let t = 0;t<this.buttons.length;t++){
+                this.buttons[t].draw()
+            }
+        }
+    }
+}
+
+
+
     function empty() {
     }
 
@@ -5716,6 +5779,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     class Throbert {
         constructor() {
+            this.pause = new PauseMenu()
             this.haspicked = 0
             this.smack = 0
             this.lmom = 50
@@ -5774,7 +5838,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             // }
             // ////console.log(this)
             this.body = new Circle(5120, 5120, 7, "#090909")
-            canvas_context.translate(-(1920 + 2560), -((1920 + 2560) + 300))
+            canvas_context.translate(-(1920 + 2560), -((1920 + 2560) + 280))
             this.seek = new CircleS(5120, 5120, 8, "#FF00FF")
             this.sproutventory = []
             this.supersize = 10
@@ -7278,6 +7342,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
 
             canvas_context.drawImage(this.captain, 0, 0, this.captain.width, this.captain.height, Math.round(this.body.x - this.body.radius), Math.round(this.body.y - this.body.radius), 2 * this.body.radius, 2 * this.body.radius)
+           
+           
+
 
             this.smack--
             this.pulse = new CircleS(this.body.x, this.body.y, this.body.radius * 2, "white")
@@ -7297,7 +7364,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.pulse.draw()
                 }
             }
+
+
             canvas_context.translate(xdiff, ydiff)
+            if(gamepadAPI.buttonsStatus.includes('Y') || keysPressed['m']){
+                megamap_context.drawImage(this.worldmap, 0, 0, 5120,5120, 0,0,10240,10240) ///, 1024, 1024, 0, 0, 10240, 10240)
+                // megamap_context.drawImage(canvas, 0,0, 1280,720, (this.body.x + 200) + (Math.max(throbert.body.x-640, 0)/32), (this.body.y-200) + (Math.max(throbert.body.y-360, 0)/32), (1280/32),(720/32))
+                megamap_context.drawImage(canvas, 0,0, 1280,720,  (Math.max(throbert.body.x-640, 0)), (Math.max(throbert.body.y-360, 0)), (1280),(720))
+                megamap_context.drawImage(this.captain, 0, 0, this.captain.width, this.captain.height, Math.round(this.body.x - (this.body.radius*20)), Math.round(this.body.y - (this.body.radius*20)), 40 * this.body.radius, 40 * this.body.radius)
+                canvas_context.drawImage(megamap, 0, 0, 10240,10240, this.body.x + 200, this.body.y-200, 320,320) ///, 1024, 1024, 0, 0, 10240, 10240)
+    
+            }
 
 
             canvas_context.lineWidth = 1// this.strokeWidth
@@ -7329,6 +7406,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
             // canvas_context.fillText('Priority: ' +globalPrio, this.body.x - 620, this.body.y - 150)
             // ////console.log(this)
 
+
+            this.pause.draw()
+
+
+
+
             if (gamepadAPI.buttonsStatus.includes('RB') || gamepadAPI.buttonsStatus.includes('LB')) {
                 for (let t = 0; t < this.sproutventory.length; t++) {
                     this.sproutventory[t].attent = -59
@@ -7350,14 +7433,27 @@ window.addEventListener('DOMContentLoaded', (event) => {
     let oldframes = 0
     function main() {
 
+        canvas_context.clearRect(-1000000, -1000000, canvas.width * 10000000, canvas.height * 10000000)
+        gamepadAPI.update()
+        if(throbert.pause.paused == 1){
+            throbert.pause.draw()
+            if(keysPressed['r']){
+                throbert.pause.paused = 0
+            }
+            return
+        }else{
+            if(keysPressed['p']){
+                // throbert.pause.paused = 1
+            }
+        }
+
         if (Math.abs(now - Date.now()) > 1000) {
             oldframes = frames
             frames = 0
             now = Date.now()
         }
         frames++
-        canvas_context.clearRect(-1000000, -1000000, canvas.width * 10000000, canvas.height * 10000000)
-        gamepadAPI.update()
+   
         throbert.draw()
         // if (keysPressed['-'] && recording == 0) {
         //     recording = 1
