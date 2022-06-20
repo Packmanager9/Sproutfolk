@@ -556,6 +556,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             // const center = new PointD(this.x+(this.width*.5), this.y+(this.height*.5))
             const center = new PointD(0 + (healthcanvas.width * .5), 0 + (healthcanvas.height * .5))
 
+            health_context.fillStyle = "black"
+            health_context.fillRect(0, 0, 40, 40)
             health_context.fillStyle = this.color
             health_context.beginPath();
             health_context.arc(center.x, center.y, 100, 0, (Math.PI * (ratio * 2)), false)
@@ -2789,6 +2791,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.symom *= .8
             }
         }
+
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x - 10, this.body.y + (this.body.radius * 1.2), 20, 20, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
+            }
+        }
         draw() {
 
             if (this.playlink.hypotenuse() > 950) {
@@ -3087,10 +3096,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.body.timer <= 0) {
                 this.spliceout = 1
             }
-            this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
-            if (this.health != this.maxhealth && this.marked != 1) {
-                this.healthbar.draw()
-            }
+            // this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            // if (this.health != this.maxhealth && this.marked != 1) {
+            //     this.healthbar.draw()
+            // }
+
+            //this.healthDraw()
             // canvas_context.drawImage(this.img, this.body.x - this.body.radius, this.body.y - this.body.radius)
 
             canvas_context.lineWidth = 1// this.strokeWidth
@@ -3231,6 +3242,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.ymom *= .8
                 this.body.sxmom *= .8
                 this.body.symom *= .8
+            }
+        }
+
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x - 10, this.body.y + (this.body.radius * 1.2), 20, 20, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
             }
         }
         draw() {
@@ -3420,10 +3438,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.body.timer <= 0) {
                 this.spliceout = 1
             }
-            this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
-            if (this.health != this.maxhealth && this.marked != 1) {
-                this.healthbar.draw()
-            }
+            // this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            // if (this.health != this.maxhealth && this.marked != 1) {
+            //     this.healthbar.draw()
+            // }
+
+            //this.healthDraw()
             // canvas_context.drawImage(this.img, this.body.x - this.body.radius, this.body.y - this.body.radius)
 
             canvas_context.lineWidth = 1// this.strokeWidth
@@ -3679,6 +3699,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.symom *= .8
             }
         }
+
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x - 6.5, this.body.y + (this.body.radius * 1.2), 13, 13, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
+            }
+        }
         draw() {
             if (this.playlink.hypotenuse() > 750) {
                 return
@@ -3885,11 +3912,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.body.timer <= 0) {
                 this.spliceout = 1
             }
-            this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
-            if (this.health != this.maxhealth && this.marked != 1) {
-                this.healthbar.draw()
-            }
+            // this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            // if (this.health != this.maxhealth && this.marked != 1) {
+            //     this.healthbar.draw()
+            // }
             // this.body.draw()
+            //this.healthDraw()
 
             canvas_context.drawImage(this.img, this.body.x - this.body.radius, this.body.y - this.body.radius)
             this.body.health = this.health
@@ -3989,6 +4017,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.symom *= .8
             }
         }
+        
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x - 8, this.body.y + (this.body.radius * 1.2), 16, 16, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
+            }
+        }
+        
+        
+
         draw() {
             if (this.playlink.hypotenuse() > 1200) {
                 return
@@ -4246,10 +4284,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.body.timer <= 0) {
                 this.spliceout = 1
             }
-            this.healthbar = new Rectangle(this.body.x - 16, this.body.y + 18, (32) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
-            if (this.health != this.maxhealth && this.marked != 1) {
-                this.healthbar.draw()
-            }
+            // this.healthbar = new Rectangle(this.body.x - 16, this.body.y + 18, (32) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            // if (this.health != this.maxhealth && this.marked != 1) {
+            //     this.healthbar.draw()
+            // }
+            //this.healthDraw()
             // this.body.draw()
             if (this.body.radius == 16) {
                 canvas_context.drawImage(this.doodle, this.body.x - 16, this.body.y - 16)
@@ -4346,6 +4385,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.symom *= .8
             }
         }
+
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x - 8, this.body.y + (this.body.radius * 1.2), 16, 16, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
+            }
+        }
+        
+        
         draw() {
             if (this.playlink.hypotenuse() > 1200) {
                 return
@@ -4645,10 +4693,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.body.timer <= 0) {
                 this.spliceout = 1
             }
-            this.healthbar = new Rectangle(this.body.x - 16, this.body.y + 18, (32) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
-            if (this.health != this.maxhealth && this.marked != 1) {
-                this.healthbar.draw()
-            }
+            // this.healthbar = new Rectangle(this.body.x - 16, this.body.y + 18, (32) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            // if (this.health != this.maxhealth && this.marked != 1) {
+            //     this.healthbar.draw()
+            // }
+            //this.healthDraw()
             // this.body.draw()
             if (this.body.radius == 16) {
                 canvas_context.drawImage(this.doodle, this.body.x - 16, this.body.y - 16)
@@ -4723,6 +4772,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.symom *= .8
             }
         }
+
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x - 12, this.body.y + (this.body.radius * 1.2), 24, 24, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
+            }
+        }
+        
+        
         draw() {
 
             if (this.playlink.hypotenuse() > 750) {
@@ -5013,11 +5071,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.hx1.draw()
                 this.hx2.draw()
 
-                this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+                // this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
 
-                if (this.health != this.maxhealth && this.marked != 1) {
-                    this.healthbar.draw()
-                }
+                // if (this.health != this.maxhealth && this.marked != 1) {
+                //     this.healthbar.draw()
+                // }
+                //this.healthDraw()
             }
             if (throbert.body.doesPerimeterTouch(this.body)) {
                 const angle = this.playlink.angle()
@@ -5190,7 +5249,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             //     this.healthbar.draw()
             // }
 
-            this.healthDraw()
+            //this.healthDraw()
             // this.body.draw()
             canvas_context.drawImage(bumper, 0, 0, bumper.width, bumper.height, this.body.x - this.body.radius, this.body.y - this.body.radius, this.body.radius * 2, this.body.radius * 2)
             this.body.health = this.health
@@ -5386,7 +5445,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.body.timer <= 0) {
                 this.spliceout = 1
             }
-            this.healthDraw()
+            //this.healthDraw()
             // this.body.draw()
             canvas_context.drawImage(ploosheet, 12 * (this.step % 18), 0, 12, 12, this.body.x - this.body.radius, this.body.y - this.body.radius, 12, 12)
             this.body.health = this.health
@@ -7039,6 +7098,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     }
                 }
             }
+
             for (let t = 0; t < this.enemies.length; t++) {
 
                 this.enemies[t].speedlimit()
@@ -7620,6 +7680,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     // throbert.generate(0)
                 }
             }
+
+
+            for (let t = 0; t < this.enemies.length; t++) {
+                if(this.enemies[t].out != 1){
+                    if(typeof this.enemies[t].healthDraw == "function"){
+                        this.enemies[t].healthDraw()
+                    }
+                }
+            }
+
 
             canvas_context.drawImage(this.captain, 0, 0, this.captain.width, this.captain.height, Math.round(this.body.x - this.body.radius), Math.round(this.body.y - this.body.radius), 2 * this.body.radius, 2 * this.body.radius)
 
