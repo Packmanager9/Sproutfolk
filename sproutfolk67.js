@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     charge.src = "charge.mp3"
     let whistle = new Audio()
     whistle.src = "whistle.mp3"
-    whistle.volume = .3 
+    whistle.volume = .3
     let beamboss = new Audio()
     let absorb = new Audio()
     absorb.src = "absorb.mp3"
@@ -500,6 +500,77 @@ window.addEventListener('DOMContentLoaded', (event) => {
         draw() {
             canvas_context.fillStyle = this.color
             canvas_context.fillRect(this.x, this.y, this.width, this.height)
+        }
+        move() {
+            this.x += this.xmom
+            this.y += this.ymom
+        }
+        isPointInside(point) {
+            if (point.x >= this.x) {
+                if (point.y >= this.y) {
+                    if (point.x <= this.x + this.width) {
+                        if (point.y <= this.y + this.height) {
+                            return true
+                        }
+                    }
+                }
+            }
+            return false
+        }
+        doesPerimeterTouch(point) {
+            if (point.x + point.radius >= this.x) {
+                if (point.y + point.radius >= this.y) {
+                    if (point.x - point.radius <= this.x + this.width) {
+                        if (point.y - point.radius <= this.y + this.height) {
+                            return true
+                        }
+                    }
+                }
+            }
+            return false
+        }
+    }
+    class Healthbox {
+        constructor(x, y, width, height, color, fill = 1, stroke = 0, strokeWidth = 1) {
+            this.x = x
+            this.y = y
+            this.height = height
+            this.width = width
+            this.color = color
+            this.xmom = 0
+            this.ymom = 0
+            this.stroke = stroke
+            this.strokeWidth = strokeWidth
+            this.fill = fill
+        }
+        draw(ratio) {
+
+            // megamap_context.lineWidth = 1// this.strokeWidth
+            // megamap_context.strokeStyle = `White`
+            // megamap_context.beginPath();
+            // megamap_context.arc(center.x, center.y, 100, 0, (Math.PI * 2), true)
+            // megamap_context.fillStyle = "black"
+            // megamap_context.fill()
+            // megamap_context.stroke();
+
+            // const center = new PointD(this.x+(this.width*.5), this.y+(this.height*.5))
+            const center = new PointD(0 + (healthcanvas.width * .5), 0 + (healthcanvas.height * .5))
+
+            health_context.fillStyle = this.color
+            health_context.beginPath();
+            health_context.arc(center.x, center.y, 100, 0, (Math.PI * (ratio * 2)), false)
+
+            health_context.lineTo(center.x, center.y);
+            health_context.lineTo((center.x) + 100, center.y);
+            health_context.fillStyle = `rgb(${(1 - ratio) * 255}, ${(ratio * 255)}, ${128})`
+            health_context.fill()
+            // ((this.health / this.maxhealth) * 2)
+            health_context.strokeStyle = "white"
+            health_context.lineWidth = 10
+            health_context.strokeRect(0, 0, 40, 40)
+            canvas_context.drawImage(healthcanvas, 0, 0, 40, 40, this.x, this.y, this.width, this.height)
+            health_context.clearRect(0, 0, 40, 40)
+
         }
         move() {
             this.x += this.xmom
@@ -1977,7 +2048,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     let setup_canvas = document.getElementById('canvas') //getting canvas from document
     let megamap = document.getElementById('megamap') //getting canvas from document
+    let healthcanvas = document.getElementById('healthcanvas') //getting canvas from document
     let megamap_context = megamap.getContext('2d');
+    let health_context = healthcanvas.getContext('2d');
+
+
     // let textbox = document.getElementById('text') //getting canvas from document
 
     setUp(setup_canvas) // setting up canvas refrences, starting timer. 
@@ -2029,6 +2104,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     class Sproutfolk {
         constructor(x, y, type) {
+            this.carryingbomb = -10
             this.hittime = Math.floor(Math.random() * 100)
             this.bloomdriptimer = 0
             this.bloom = 0
@@ -2304,20 +2380,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
         draw() {
 
-            if(throbert.haspicked <= 1){
+            if (throbert.haspicked <= 1 && this.grounded == 1) {
                 canvas_context.fillStyle = "white"
                 canvas_context.font = "11px arial"
-                if(this.body.y > throbert.c1.y){
-                    if(this.body.x > throbert.c1.x){
-                    canvas_context.fillText("Pick me!",( this.body.x-(canvas_context.measureText("Pick Me!").width*.5))+5, this.body.y+13)
-                    }else{
-                        canvas_context.fillText("Pick me!", (this.body.x-(canvas_context.measureText("Pick Me!").width*.5))-15, this.body.y+13)
+                if (this.body.y > throbert.c1.y) {
+                    if (this.body.x > throbert.c1.x) {
+                        canvas_context.fillText("Pick me!", (this.body.x - (canvas_context.measureText("Pick Me!").width * .5)) + 5, this.body.y + 13)
+                    } else {
+                        canvas_context.fillText("Pick me!", (this.body.x - (canvas_context.measureText("Pick Me!").width * .5)) - 15, this.body.y + 13)
                     }
-                }else{
-                    if(this.body.x > throbert.c1.x){
-                    canvas_context.fillText("Pick me!", (this.body.x-(canvas_context.measureText("Pick Me!").width*.5))+5, this.body.y-7)
-                    }else{
-                    canvas_context.fillText("Pick me!", (this.body.x-(canvas_context.measureText("Pick Me!").width*.5))-10, this.body.y-7)
+                } else {
+                    if (this.body.x > throbert.c1.x) {
+                        canvas_context.fillText("Pick me!", (this.body.x - (canvas_context.measureText("Pick Me!").width * .5)) + 5, this.body.y - 7)
+                    } else {
+                        canvas_context.fillText("Pick me!", (this.body.x - (canvas_context.measureText("Pick Me!").width * .5)) - 10, this.body.y - 7)
                     }
                 }
             }
@@ -2351,23 +2427,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.ycord = Math.max(this.ycord, 0)
                 this.ycord = Math.min(this.ycord, 10230)
 
-            this.vmax = throbert.road[`${this.xcord},${this.ycord}`].z
-            this.vmin = throbert.road[`${this.xcord},${this.ycord}`].z
+                this.vmax = throbert.road[`${this.xcord},${this.ycord}`].z
+                this.vmin = throbert.road[`${this.xcord},${this.ycord}`].z
                 for (let t = Math.max(this.xcord - 20, 0); t < Math.min(this.xcord + 30, 10230); t += ten) {
                     for (let k = Math.max(this.ycord - 20, 0); k < Math.min(this.ycord + 30, 10230); k += ten) {
                         this.vsum += Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z)
-                        if(this.vmax < throbert.road[`${t},${k}`].z){
+                        if (this.vmax < throbert.road[`${t},${k}`].z) {
                             this.vmax = throbert.road[`${t},${k}`].z
-                        }else if(this.vmin > throbert.road[`${t},${k}`].z){
+                        } else if (this.vmin > throbert.road[`${t},${k}`].z) {
                             this.vmin = throbert.road[`${t},${k}`].z
                         }
                     }
                 }
             }
-            if (this.ignore == 1 || this.vsum <= .05 || Math.abs(this.vmax-this.vmin) < .2) {
+            if (this.ignore == 1 || this.vsum <= .05 || Math.abs(this.vmax - this.vmin) < .2) {
                 this.body.frictiveMove()
             } else {
-                const mag = Math.max(((Math.abs(this.body.xmom) + Math.abs(this.body.ymom)))*1.5, 3)
+                const mag = Math.max(((Math.abs(this.body.xmom) + Math.abs(this.body.ymom))) * 1.5, 3)
                 if (mag > 0) {
                     const stepper = 1 / mag
                     for (let x = 0; x < mag; x++) {
@@ -2465,12 +2541,25 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 }
             }
 
+            if (this.carryingbomb < 0) {
+                this.carryingbomb++
+            }
 
             if (this.fly > 0) {
                 this.fly--
                 // if (this.fly == 0) {
                 this.attent = 0
                 // }
+                if (this.carryingbomb == 1) {
+                    if (this.fly == 1) {
+                        this.carryingbomb = -10
+                        this.bomb.active = 1
+                        this.bomb.cling = 0
+                        this.attent = 1
+                        this.fly = 0
+                        this.busy = 0
+                    }
+                }
             }
             if (this.grounded == 1) {
                 if (this.bloom < 2) {
@@ -2483,7 +2572,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.radius = 3.5 + (Math.abs(this.grounded)) + (Math.abs(this.grab * 1.5)) + (Math.abs(Math.max(this.fly, 0) * .16))
                 if (this.marked > 0) {
                     // //console.log("hitt")
-                    if(this.marked == 19){
+                    if (this.marked == 19) {
                         for (let t = 0; t < worksounds.length; t++) {
                             if (worksounds[t].paused) {
                                 worksounds[t].play()
@@ -2513,7 +2602,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.cling = 0
                 }
             }
-            if (this.cling == 1) {
+            if (this.cling == 1 && this.clingTo.bomb !== 1) {
                 this.body.x = this.clingTo.x + this.clingx + ((Math.random() - .5) * .01)
                 this.body.y = this.clingTo.y + this.clingy + ((Math.random() - .5) * .01)
                 this.clingTo.release--
@@ -2533,7 +2622,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         this.body.ymom = 0
                         if (this.clingTo.timer > 20) {
                             this.clingTo.timer = 20
-                            if(throbert.playlink.hypotenuse() < 900){
+                            if (throbert.playlink.hypotenuse() < 900) {
                                 absorb.play()
                             }
                         }
@@ -2547,7 +2636,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     }
                 }
             } else {
-                this.carrying = 0
+                if (this.clingTo.bomb == 1) {
+                    console.log(this)
+                } else {
+
+                    this.carrying = 0
+                }
             }
 
             this.body.x = Math.min(Math.max(Math.round(this.body.x), 0), 10240)
@@ -2700,7 +2794,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.playlink.hypotenuse() > 950) {
                 return
             }
-            
+
             if (this.health <= 0) {
                 this.body.smove()
             } else {
@@ -3245,42 +3339,42 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.health > 0) {
                 this.angle = this.body.angle
             }
-                if (this.health > 0) {
-                    if (this.health < this.maxhealth) {
-                        this.cycle++
-                        if ((this.cycle % 25).between(20, 25)) {
-                            this.body.radius = 30 + (Math.abs(5 - (this.cycle % 10)) * 2)
-                            this.pulse = 1
-                        } else {
-                            this.pulse = 0
-                            this.body.radius = 30
-                        }
+            if (this.health > 0) {
+                if (this.health < this.maxhealth) {
+                    this.cycle++
+                    if ((this.cycle % 25).between(20, 25)) {
+                        this.body.radius = 30 + (Math.abs(5 - (this.cycle % 10)) * 2)
+                        this.pulse = 1
+                    } else {
+                        this.pulse = 0
+                        this.body.radius = 30
                     }
                 }
+            }
 
-            if(this.cycle%25 == 0){
+            if (this.cycle % 25 == 0) {
                 this.legindex++
-                this.legindex%=8
+                this.legindex %= 8
             }
 
             for (let t = 0; t < this.legs.length; t++) {
-                this.legs[t].x = this.body.x + (Math.cos(this.legangle +this.angle + this.legs[t].offsetangle) *( Math.min(this.body.radius,30)*3.3))
-                this.legs[t].y = this.body.y + (Math.sin(this.legangle +this.angle + this.legs[t].offsetangle) * ( Math.min(this.body.radius,30)*3.3))
-                this.legs[t].radius = Math.min(this.body.radius,32)*.25
-                this.legangle+=Math.PI*.4
+                this.legs[t].x = this.body.x + (Math.cos(this.legangle + this.angle + this.legs[t].offsetangle) * (Math.min(this.body.radius, 30) * 3.3))
+                this.legs[t].y = this.body.y + (Math.sin(this.legangle + this.angle + this.legs[t].offsetangle) * (Math.min(this.body.radius, 30) * 3.3))
+                this.legs[t].radius = Math.min(this.body.radius, 32) * .25
+                this.legangle += Math.PI * .4
 
                 this.legs[t].link.draw()
                 this.legs[t].draw()
-                if(this.health > 0){
+                if (this.health > 0) {
                     this.legs[t].bumper.x = this.legs[t].x
                     this.legs[t].bumper.y = this.legs[t].y
-                    if(this.health < this.maxhealth){
-    
+                    if (this.health < this.maxhealth) {
+
                         if (this.legindex == t) {
                             if (throbert.body.doesPerimeterTouch(this.legs[t].bumper)) {
                                 throbert.health--
                             }
-    
+
                             this.legs[t].bumper.draw()
                             for (let k = 0; k < throbert.sproutventory.length; k++) {
                                 const pang = this.elinks[k].angle()
@@ -3305,8 +3399,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                     }
                                 }
                             }
-        
-        
+
+
                             if (this.legs[t].dir == 1) {
                                 this.legs[t].offsetangle += .04
                                 if (Math.abs(this.legs[t].offsetangle) > 1) {
@@ -3447,7 +3541,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.pen = pen
             this.body.friction = .9
             this.playlink = new LineOP(this.body, throbert.body)
-            this.firstdead =0
+            this.firstdead = 0
         }
 
         nameGenerator() {
@@ -3870,7 +3964,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.playlink = new LineOPD(this.body, throbert.body)
             this.spoutcount = 0
             this.shots = []
-            this.firstdead =0
+            this.firstdead = 0
         }
 
         jumpspin() {
@@ -4227,7 +4321,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.playlink = new LineOPD(this.body, throbert.body)
             this.spoutcount = 0
             this.shots = []
-            this.firstdead =0
+            this.firstdead = 0
         }
 
         jumpspin() {
@@ -4952,7 +5046,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.cycle = 0
             this.playlink = new LineOPD(this.body, throbert.body)
             this.pulse = 0
-            this.firstdead =0
+            this.firstdead = 0
+        }
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x - 7, this.body.y + (this.body.radius * 1.2), 14, 14, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
+            }
         }
         speedlimit() {
             let brf = 0
@@ -5084,11 +5184,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.body.timer <= 0) {
                 this.spliceout = 1
             }
-            this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            // this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
 
-            if (this.health != this.maxhealth && this.marked != 1) {
-                this.healthbar.draw()
-            }
+            // if (this.health != this.maxhealth && this.marked != 1) {
+            //     this.healthbar.draw()
+            // }
+
+            this.healthDraw()
             // this.body.draw()
             canvas_context.drawImage(bumper, 0, 0, bumper.width, bumper.height, this.body.x - this.body.radius, this.body.y - this.body.radius, this.body.radius * 2, this.body.radius * 2)
             this.body.health = this.health
@@ -5167,7 +5269,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.playlink = new LineOPD(this.body, throbert.body)
             this.step = Math.floor(Math.random() * 18)
             this.type = Math.floor(Math.random() * 2)
-            this.firstdead =0
+            this.firstdead = 0
+        }
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x - 6, this.body.y + (this.body.radius * 1.2), 12, 12, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
+            }
         }
         speedlimit() {
             let brf = 0
@@ -5278,11 +5386,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.body.timer <= 0) {
                 this.spliceout = 1
             }
-            this.healthbar = new Rectangle(this.body.x - this.body.radius, this.body.y + (this.body.radius * 1.2), (this.body.radius * 2) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
-
-            if (this.health != this.maxhealth && this.marked != 1) {
-                this.healthbar.draw()
-            }
+            this.healthDraw()
             // this.body.draw()
             canvas_context.drawImage(ploosheet, 12 * (this.step % 18), 0, 12, 12, this.body.x - this.body.radius, this.body.y - this.body.radius, 12, 12)
             this.body.health = this.health
@@ -5296,70 +5400,187 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
 
-class MenuButton {
-    constructor(x,y,text){
-        canvas_context.font = "20px arial"
-        canvas_context.fillStyle = "white"
+    class MenuButton {
+        constructor(x, y, text) {
+            canvas_context.font = "20px arial"
+            canvas_context.fillStyle = "white"
 
-        this.h = canvas_context.measureText(text).actualBoundingBoxAscent + canvas_context.measureText(text).actualBoundingBoxDescent
+            this.h = canvas_context.measureText(text).actualBoundingBoxAscent + canvas_context.measureText(text).actualBoundingBoxDescent
 
 
-        this.x = x
-        this.y = y
-        this.body = new Rectangle(0,0,canvas_context.measureText(text).width+10, this.h+12, "#EE4444dd")
-        this.text = text
-    }
-    draw(){
-        this.body.x = throbert.pause.body.x+this.x
-        this.body.y = throbert.pause.body.y+this.y
-        this.body.draw()
-        canvas_context.font = "20px arial"
-        canvas_context.fillStyle = "white"
-        canvas_context.fillText(this.text, this.body.x+5, this.body.y+this.h+5)
-    }
-}
-
-class PauseMenu {
-    constructor(){
-        this.body = new Rectangle(0,0, 1280, 720, "#0044FF44")
-        this.paused = 0
-        this.buttons = []
-        this.buttons.push(new MenuButton(100,100, "everything is a test to cole" ))
-        this.buttons.push(new MenuButton(100,150, "this is a menu" ))
-        this.buttons.push(new MenuButton(100,200, "..." ))
-        this.buttons.push(new MenuButton(100,250, "JPpjqQ|0{}#1@H8^" ))
-        this.buttons.push(new MenuButton(100,300, "Enemy Encyclopedia" ))
-        this.buttons.push(new MenuButton(100,350, "Part Notes" ))
-        this.buttons.push(new MenuButton(100,400, " " ))
-        this.buttons.push(new MenuButton(100,450, "Player stats" ))
-    }
-    buttons(point){
-
-    }
-    draw(){
-        if(this.paused == 1){
-            this.body = new Rectangle(throbert.body.x-640,throbert.body.y-360, 1280, 720, "#0044FF44")
+            this.x = x
+            this.y = y
+            this.body = new Rectangle(0, 0, canvas_context.measureText(text).width + 10, this.h + 12, "#EE4444dd")
+            this.text = text
+        }
+        draw() {
+            this.body.x = throbert.pause.body.x + this.x
+            this.body.y = throbert.pause.body.y + this.y
             this.body.draw()
+            canvas_context.font = "20px arial"
+            canvas_context.fillStyle = "white"
+            canvas_context.fillText(this.text, this.body.x + 5, this.body.y + this.h + 5)
+        }
+    }
 
-        canvas_context.font = "50px arial"
-        canvas_context.fillStyle = "white"
-        canvas_context.fillText("Paused", this.body.x+550, this.body.y+100)
+    class PauseMenu {
+        constructor() {
+            this.body = new Rectangle(0, 0, 1280, 720, "#0044FF44")
+            this.paused = 0
+            this.buttons = []
+            this.buttons.push(new MenuButton(100, 100, "everything is a test to cole"))
+            this.buttons.push(new MenuButton(100, 150, "this is a menu"))
+            this.buttons.push(new MenuButton(100, 200, "..."))
+            this.buttons.push(new MenuButton(100, 250, "JPpjqQ|0{}#1@H8^"))
+            this.buttons.push(new MenuButton(100, 300, "Enemy Encyclopedia"))
+            this.buttons.push(new MenuButton(100, 350, "Part Notes"))
+            this.buttons.push(new MenuButton(100, 400, " "))
+            this.buttons.push(new MenuButton(100, 450, "Player stats"))
+        }
+        buttons(point) {
+
+        }
+        draw() {
+            if (this.paused == 1) {
+                this.body = new Rectangle(throbert.body.x - 640, throbert.body.y - 360, 1280, 720, "#0044FF44")
+                this.body.draw()
+
+                canvas_context.font = "50px arial"
+                canvas_context.fillStyle = "white"
+                canvas_context.fillText("Paused", this.body.x + 550, this.body.y + 100)
 
 
-            for(let t = 0;t<this.buttons.length;t++){
-                this.buttons[t].draw()
+                for (let t = 0; t < this.buttons.length; t++) {
+                    this.buttons[t].draw()
+                }
             }
         }
     }
-}
 
+
+
+
+    const hotbomb = new Image()
+    hotbomb.src = "hotbomb.png"
+
+    class HotBomb {
+        constructor(x, y) {
+            this.body = new Circle(x, y, 5, "transparent")
+            this.suprabody = new Circle(x, y, 30, "red")
+            this.body.bomb = 1
+            this.bomb = 1
+            this.step = 0
+            this.rate = 2
+            this.cycle = 0
+            this.blast = 0
+            this.marked = 0
+            this.active = 0
+            this.spliceout = 0
+            this.value = 0
+            this.playlink = new LineOPD(this.body, throbert.body)
+            this.health = 1000000
+            this.maxhealth = this.health
+            this.weight = 10000
+            this.body.weight = 1 / this.weight
+        }
+        speedlimit() {
+
+        }
+        draw() {
+            if (this.cling == 1) {
+                this.body.radius = 2.5
+                this.body.x = this.clingTo.body.x
+                this.body.y = this.clingTo.body.y
+            } else {
+                if (this.blast != 1) {
+                    this.body.radius = 5
+                }
+            }
+
+            if (this.playlink.hypotenuse() > 750) {
+                return
+            }
+
+            this.suprabody = new Circle(this.body.x, this.body.y, 30, "red")
+            if (this.active == 1) {
+                if (this.step == 7) {
+                    if (this.body.radius < 51) {
+                        this.body.radius += 8
+                    } else {
+                        this.spliceout = 1
+                        this.marked = 3
+                    }
+                    this.blast = 1
+                    for(let t = 0;t<throbert.enemies.length;t++){
+                        if(this.body.doesPerimeterTouch(throbert.enemies[t].body)){
+                            throbert.enemies[t].health -= (throbert.enemies[t].maxhealth*.1) + 50
+                        }
+                    }
+                    this.body.color = "#FFAAAA55"
+                    this.body.draw()
+                    // canvas_context.drawImage(hotbomb, (this.step % 8) * (hotbomb.width / 8), 0, hotbomb.width / 8, hotbomb.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                } else {
+                    this.cycle++
+                    if (this.cycle > this.rate) {
+                        this.cycle = 0
+                        this.step++
+                    }
+                    canvas_context.drawImage(hotbomb, (this.step % 8) * (hotbomb.width / 8), 0, hotbomb.width / 8, hotbomb.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                }
+            } else {
+
+                for (let t = 0; t < throbert.sproutventory.length; t++) {
+                    if (this.suprabody.doesPerimeterTouch(throbert.sproutventory[t].body)) {
+                        // this.suprabody.draw()
+                        if (throbert.sproutventory[t].type != 2) {
+                            // this.suprabody.color = "orange"
+                            // this.suprabody.draw()
+                            if (this.active != 2) {
+                                this.active = 1
+                            }
+                        } else {
+                            if (this.body.doesPerimeterTouch(throbert.sproutventory[t].body)) {
+                                if (throbert.sproutventory[t].busy != 1) {
+                                    if (throbert.sproutventory[t].carryingbomb >= 0 && this.picked != 1) {
+                                    this.cling = 1
+                                    this.clingTo = throbert.sproutventory[t]
+                                    this.active = 2
+                                    throbert.sproutventory[t].carryingbomb = 1
+                                    throbert.sproutventory[t].bomb = this
+                                    throbert.sproutventory[t].busy = 1
+                                    this.picked = 1
+                                }
+                            }
+                                // this.suprabody.color = "orange"
+                                // this.suprabody.draw()
+                            }
+                        }
+                    }
+                }
+
+
+                canvas_context.drawImage(hotbomb, (this.step % 8) * (hotbomb.width / 8), 0, hotbomb.width / 8, hotbomb.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+
+            }
+
+            if (throbert.body.doesPerimeterTouch(this.body)) {
+                if (this.active == 2) {
+
+                } else {
+                    const angle = this.playlink.angle()
+                    throbert.body.xmom -= Math.cos(angle) * 6.1
+                    throbert.body.ymom -= Math.sin(angle) * 6.1
+                    if (this.blast == 1) {
+                        throbert.health -= 2
+                    }
+                }
+            }
+        }
+    }
 
 
     function empty() {
     }
-
-
-
     const shotspritem = new Image()
     shotspritem.src = "shotspritem.png"
     const shotspritey = new Image()
@@ -5392,95 +5613,95 @@ class PauseMenu {
     doodlec.src = "doodlec.png"
     const gearsheet = new Image()
     gearsheet.src = "enginesheet.png" //
-    canvas_context.drawImage(gearsheet,0,0)
+    canvas_context.drawImage(gearsheet, 0, 0)
     const spinbox = new Image()
     spinbox.src = "spinbox2.png" //
-    canvas_context.drawImage(spinbox,0,0)
+    canvas_context.drawImage(spinbox, 0, 0)
     const orbpartsheet = new Image()
     orbpartsheet.src = "orbpartsheet2.png" /// 
-    canvas_context.drawImage(orbpartsheet,0,0)
+    canvas_context.drawImage(orbpartsheet, 0, 0)
     const snakepart = new Image()
     snakepart.src = "snakepart.png"
-    canvas_context.drawImage(snakepart,0,0)
+    canvas_context.drawImage(snakepart, 0, 0)
     const bubblepart = new Image()
     bubblepart.src = "bubblepart.png"
-    canvas_context.drawImage(bubblepart,0,0)
+    canvas_context.drawImage(bubblepart, 0, 0)
     const clockwork = new Image()
     clockwork.src = "clocksmall.png"  //
-    canvas_context.drawImage(clockwork,0,0)
+    canvas_context.drawImage(clockwork, 0, 0)
     const harmlessdisarmerpart = new Image()
     harmlessdisarmerpart.src = "harmlessdisarmerpartinv.png" //
-    canvas_context.drawImage(gearsheet,0,0)
+    canvas_context.drawImage(gearsheet, 0, 0)
     const rainbowfuelpart = new Image()
     rainbowfuelpart.src = "fuelout.png"
-    canvas_context.drawImage(rainbowfuelpart,0,0)
+    canvas_context.drawImage(rainbowfuelpart, 0, 0)
     const warjarpart = new Image()
     warjarpart.src = "warjar.png"
-    canvas_context.drawImage(warjarpart,0,0)
+    canvas_context.drawImage(warjarpart, 0, 0)
     const brainpart = new Image()
     brainpart.src = "brainpart.png"
-    canvas_context.drawImage(brainpart,0,0)
+    canvas_context.drawImage(brainpart, 0, 0)
     const mirrorpart = new Image()
     mirrorpart.src = "mirrorpart2.png"
-    canvas_context.drawImage(mirrorpart,0,0)
+    canvas_context.drawImage(mirrorpart, 0, 0)
     const radar = new Image()
     radar.src = "radarpart.png"
-    canvas_context.drawImage(radar,0,0)
+    canvas_context.drawImage(radar, 0, 0)
     const drive = new Image()
     drive.src = "drivepart.png"
-    canvas_context.drawImage(drive,0,0)
+    canvas_context.drawImage(drive, 0, 0)
     const boidpart = new Image()
     boidpart.src = "boidpart2.png" //
-    canvas_context.drawImage(boidpart,0,0)
+    canvas_context.drawImage(boidpart, 0, 0)
     const combatpart = new Image()
     combatpart.src = "combatpart2.png"
-    canvas_context.drawImage(combatpart,0,0)
+    canvas_context.drawImage(combatpart, 0, 0)
     const labpartsmall = new Image()
     labpartsmall.src = "labpartsmall.png" //
-    canvas_context.drawImage(labpartsmall,0,0)
+    canvas_context.drawImage(labpartsmall, 0, 0)
     const fuellinepart = new Image()
     fuellinepart.src = "fuellinepart.png" //
-    canvas_context.drawImage(labpartsmall,0,0)
+    canvas_context.drawImage(labpartsmall, 0, 0)
     const drone985 = new Image()
     drone985.src = "drone985.png" //
-    canvas_context.drawImage(drone985,0,0)
+    canvas_context.drawImage(drone985, 0, 0)
     const filterpart = new Image()
     filterpart.src = "filterpart.png" //
-    canvas_context.drawImage(filterpart,0,0)
+    canvas_context.drawImage(filterpart, 0, 0)
     const holepart = new Image()
     holepart.src = "holepart.png"
-    canvas_context.drawImage(holepart,0,0)
+    canvas_context.drawImage(holepart, 0, 0)
     const lamppart = new Image()
     lamppart.src = "lamppart 2.png"
-    canvas_context.drawImage(lamppart,0,0)
+    canvas_context.drawImage(lamppart, 0, 0)
     const heaterpart = new Image()
     heaterpart.src = "heaterpart 2.png"
-    canvas_context.drawImage(heaterpart,0,0)
+    canvas_context.drawImage(heaterpart, 0, 0)
     const entertainmentpart = new Image()
     entertainmentpart.src = "entertainmentpart 2.png"
-    canvas_context.drawImage(entertainmentpart,0,0)
+    canvas_context.drawImage(entertainmentpart, 0, 0)
     const waterpart = new Image()
     waterpart.src = "waterpartx.png"
-    canvas_context.drawImage(waterpart,0,0)
+    canvas_context.drawImage(waterpart, 0, 0)
     const hydroponicspart = new Image()
     hydroponicspart.src = "hydroponicspartx.png"
-    canvas_context.drawImage(hydroponicspart,0,0)
+    canvas_context.drawImage(hydroponicspart, 0, 0)
     const ammopart = new Image()
     ammopart.src = "ammopart.png"
-    canvas_context.drawImage(ammopart,0,0)
+    canvas_context.drawImage(ammopart, 0, 0)
     const medbaypart = new Image()
     medbaypart.src = "medbaypart.png"
-    canvas_context.drawImage(medbaypart,0,0)
+    canvas_context.drawImage(medbaypart, 0, 0)
     const proppart = new Image()
     proppart.src = "proppart.png"
-    canvas_context.drawImage(proppart,0,0)
+    canvas_context.drawImage(proppart, 0, 0)
     const soundpart = new Image()
     soundpart.src = "soundpart2.png"
-    canvas_context.drawImage(soundpart,0,0)
+    canvas_context.drawImage(soundpart, 0, 0)
     const tarpart = new Image()
     tarpart.src = "tarpart2.png"
-    canvas_context.drawImage(tarpart,0,0)
-// console.log(clockwork.width)
+    canvas_context.drawImage(tarpart, 0, 0)
+    // console.log(clockwork.width)
     // while(clockwork.width <= 0){
     //     canvas_context.drawImage(clockwork,0,0)
     // }
@@ -5501,91 +5722,91 @@ class PauseMenu {
             this.body.health = this.health
             this.drawn = 0
 
-            if(this.type == 0){
+            if (this.type == 0) {
                 this.weight = 400
             }
-            if(this.type == 1){
+            if (this.type == 1) {
                 this.weight = 180
             }
-            if(this.type == 2){
+            if (this.type == 2) {
                 this.weight = 50
             }
-            if(this.type == 3){
+            if (this.type == 3) {
                 this.weight = 123
             }
-            if(this.type == 4){
+            if (this.type == 4) {
                 this.weight = 321
             }
-            if(this.type == 5){
+            if (this.type == 5) {
                 this.weight = 71
             }
-            if(this.type == 6){
+            if (this.type == 6) {
                 this.weight = 300
             }
-            if(this.type == 7){
+            if (this.type == 7) {
                 this.weight = 59
             }
-            if(this.type == 8){
+            if (this.type == 8) {
                 this.weight = 590
             }
-            if(this.type == 9){
+            if (this.type == 9) {
                 this.weight = 140
             }
-            if(this.type == 10){
+            if (this.type == 10) {
                 this.weight = 69
             }
-            if(this.type == 11){
+            if (this.type == 11) {
                 this.weight = 42
             }
-            if(this.type == 12){
+            if (this.type == 12) {
                 this.weight = 74
             }
-            if(this.type == 13){
+            if (this.type == 13) {
                 this.weight = 169
             }
-            if(this.type == 14){
+            if (this.type == 14) {
                 this.weight = 100
             }
-            if(this.type == 15){
+            if (this.type == 15) {
                 this.weight = 60
             }
-            if(this.type == 16){
+            if (this.type == 16) {
                 this.weight = 256
             }
-            if(this.type == 17){
+            if (this.type == 17) {
                 this.weight = 243
             }
-            if(this.type == 18){
+            if (this.type == 18) {
                 this.weight = 30
             }
-            if(this.type == 19){
+            if (this.type == 19) {
                 this.weight = 109
             }
-            if(this.type == 21){
+            if (this.type == 21) {
                 this.weight = 227
             }
-            if(this.type == 22){
+            if (this.type == 22) {
                 this.weight = 111
             }
-            if(this.type == 23){
+            if (this.type == 23) {
                 this.weight = 40
             }
-            if(this.type == 24){
+            if (this.type == 24) {
                 this.weight = 157
             }
-            if(this.type == 25){
+            if (this.type == 25) {
                 this.weight = 270
             }
-            if(this.type == 26){
+            if (this.type == 26) {
                 this.weight = 77
             }
-            if(this.type == 27){
+            if (this.type == 27) {
                 this.weight = 20
             }
-            if(this.type == 28){
+            if (this.type == 28) {
                 this.weight = 107
             }
-            if(this.type == 29){
+            if (this.type == 29) {
                 this.weight = 166
             }
             this.body.weight = 1 / this.weight
@@ -5635,7 +5856,7 @@ class PauseMenu {
 
             if (this.type == 3) {
                 this.drawn++
-                canvas_context.drawImage(snakepart, (this.step % 1126) * (snakepart.width / 1126), 0, snakepart.width / 1126, snakepart.height, this.body.x - (this.body.radius*.9), this.body.y - (this.body.radius*.9), this.body.radius * 1.8, this.body.radius * 1.8)
+                canvas_context.drawImage(snakepart, (this.step % 1126) * (snakepart.width / 1126), 0, snakepart.width / 1126, snakepart.height, this.body.x - (this.body.radius * .9), this.body.y - (this.body.radius * .9), this.body.radius * 1.8, this.body.radius * 1.8)
             }
 
             if (this.type == 4) {
@@ -5645,130 +5866,130 @@ class PauseMenu {
 
             if (this.type == 5) {
                 this.drawn++
-                canvas_context.drawImage(harmlessdisarmerpart, (this.step % 71) * (harmlessdisarmerpart.width / 71), 0, harmlessdisarmerpart.width / 71, harmlessdisarmerpart.height, this.body.x - (this.body.radius*2), this.body.y - (this.body.radius*2), this.body.radius * 4, this.body.radius * 4)
+                canvas_context.drawImage(harmlessdisarmerpart, (this.step % 71) * (harmlessdisarmerpart.width / 71), 0, harmlessdisarmerpart.width / 71, harmlessdisarmerpart.height, this.body.x - (this.body.radius * 2), this.body.y - (this.body.radius * 2), this.body.radius * 4, this.body.radius * 4)
             }
 
             if (this.type == 6) {
                 this.drawn++
                 // this.step+=11
-                canvas_context.drawImage(rainbowfuelpart, (this.step % 896) * (rainbowfuelpart.width / 896), 0, rainbowfuelpart.width / 896, rainbowfuelpart.height, this.body.x - (this.body.radius*1), this.body.y - (this.body.radius*1), this.body.radius * 2, this.body.radius * 2)
+                canvas_context.drawImage(rainbowfuelpart, (this.step % 896) * (rainbowfuelpart.width / 896), 0, rainbowfuelpart.width / 896, rainbowfuelpart.height, this.body.x - (this.body.radius * 1), this.body.y - (this.body.radius * 1), this.body.radius * 2, this.body.radius * 2)
             }
             if (this.type == 7) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(clockwork, (this.step % 355) * (clockwork.width / 355), 0, clockwork.width / 355, clockwork.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(clockwork, (this.step % 355) * (clockwork.width / 355), 0, clockwork.width / 355, clockwork.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 8) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(warjarpart, (this.step % 1902) * (warjarpart.width / 1902), 0, warjarpart.width / 1902, warjarpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(warjarpart, (this.step % 1902) * (warjarpart.width / 1902), 0, warjarpart.width / 1902, warjarpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 9) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(brainpart, (this.step % 1128) * (brainpart.width / 1128), 0, brainpart.width / 1128, brainpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(brainpart, (this.step % 1128) * (brainpart.width / 1128), 0, brainpart.width / 1128, brainpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 10) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(mirrorpart, (this.step % 244) * (mirrorpart.width / 244), 0, mirrorpart.width / 244, mirrorpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(mirrorpart, (this.step % 244) * (mirrorpart.width / 244), 0, mirrorpart.width / 244, mirrorpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 11) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(radar, (this.step % 104) * (radar.width / 104), 0, radar.width / 104, radar.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(radar, (this.step % 104) * (radar.width / 104), 0, radar.width / 104, radar.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 12) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(drive, (this.step % 326) * (drive.width / 326), 0, drive.width / 326, drive.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(drive, (this.step % 326) * (drive.width / 326), 0, drive.width / 326, drive.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 13) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(boidpart, (this.step % 684) * (boidpart.width / 684), 0, boidpart.width / 684, boidpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(boidpart, (this.step % 684) * (boidpart.width / 684), 0, boidpart.width / 684, boidpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 14) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(combatpart, (this.step % 730) * (combatpart.width / 730), 0, combatpart.width / 730, combatpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(combatpart, (this.step % 730) * (combatpart.width / 730), 0, combatpart.width / 730, combatpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 15) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(labpartsmall, (this.step % 910) * (labpartsmall.width / 910), 0, labpartsmall.width / 910, labpartsmall.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(labpartsmall, (this.step % 910) * (labpartsmall.width / 910), 0, labpartsmall.width / 910, labpartsmall.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 16) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(fuellinepart, (this.step % 910) * (fuellinepart.width / 910), 0, fuellinepart.width / 910, fuellinepart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(fuellinepart, (this.step % 910) * (fuellinepart.width / 910), 0, fuellinepart.width / 910, fuellinepart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 17) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(drone985, (this.step % 985) * (drone985.width / 985), 0, drone985.width / 985, drone985.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(drone985, (this.step % 985) * (drone985.width / 985), 0, drone985.width / 985, drone985.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 18) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(filterpart, (this.step % 482) * (filterpart.width / 482), 0, filterpart.width / 482, filterpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(filterpart, (this.step % 482) * (filterpart.width / 482), 0, filterpart.width / 482, filterpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 19) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(holepart, (this.step % 625) * (holepart.width / 625), 0, holepart.width / 625, holepart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(holepart, (this.step % 625) * (holepart.width / 625), 0, holepart.width / 625, holepart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 20) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(lamppart, (this.step % 74) * (lamppart.width / 74), 0, lamppart.width / 74, lamppart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(lamppart, (this.step % 74) * (lamppart.width / 74), 0, lamppart.width / 74, lamppart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 21) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(heaterpart, (this.step % 525) * (heaterpart.width / 525), 0, heaterpart.width / 525, heaterpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(heaterpart, (this.step % 525) * (heaterpart.width / 525), 0, heaterpart.width / 525, heaterpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 22) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(entertainmentpart, (this.step % 275) * (entertainmentpart.width / 275), 0, entertainmentpart.width / 275, entertainmentpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(entertainmentpart, (this.step % 275) * (entertainmentpart.width / 275), 0, entertainmentpart.width / 275, entertainmentpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 23) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(waterpart, (this.step % 788) * (waterpart.width / 788), 0, waterpart.width / 788, waterpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(waterpart, (this.step % 788) * (waterpart.width / 788), 0, waterpart.width / 788, waterpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 24) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(hydroponicspart, (this.step % 335) * (hydroponicspart.width / 335), 0, hydroponicspart.width / 335, hydroponicspart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(hydroponicspart, (this.step % 335) * (hydroponicspart.width / 335), 0, hydroponicspart.width / 335, hydroponicspart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 25) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(ammopart, (this.step % 504) * (ammopart.width / 504), 0, ammopart.width / 504, ammopart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(ammopart, (this.step % 504) * (ammopart.width / 504), 0, ammopart.width / 504, ammopart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 26) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(medbaypart, (this.step % 33) * (medbaypart.width / 33), 0, medbaypart.width / 33, medbaypart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(medbaypart, (this.step % 33) * (medbaypart.width / 33), 0, medbaypart.width / 33, medbaypart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 27) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(proppart, (this.step % 806) * (proppart.width / 806), 0, proppart.width / 806, proppart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(proppart, (this.step % 806) * (proppart.width / 806), 0, proppart.width / 806, proppart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 28) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(soundpart, (this.step % 396) * (soundpart.width / 396), 0, soundpart.width / 396, soundpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(soundpart, (this.step % 396) * (soundpart.width / 396), 0, soundpart.width / 396, soundpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 29) {
                 this.drawn++
                 // this.step+=4
-                canvas_context.drawImage(tarpart, (this.step % 103) * (tarpart.width / 103), 0, tarpart.width / 103, tarpart.height, this.body.x - (this.body.radius*1.0), this.body.y - (this.body.radius*1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                canvas_context.drawImage(tarpart, (this.step % 103) * (tarpart.width / 103), 0, tarpart.width / 103, tarpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
-            
+
             if (throbert.body.doesPerimeterTouch(this.body)) {
                 const angle = this.playlink.angle()
                 throbert.body.xmom -= Math.cos(angle) * 6.1
@@ -5893,7 +6114,7 @@ class PauseMenu {
             nodespecial2.big = new CircleS(700, 9700, 200, "Red")
             let nodespecial3 = new CircleS(7444, 9756, 600, "Red")
             nodespecial3.priority = 100 //this.nodemap[t].z //- (t/100000)
-            nodespecial3.small = new CircleS(7444, 9756,  20, "Red")
+            nodespecial3.small = new CircleS(7444, 9756, 20, "Red")
             nodespecial3.equity = new CircleS(7444, 9756, 660, "Red")
             nodespecial3.big = new CircleS(7444, 9756, 200, "Red")
             let nodespecial4 = new CircleS(300, 9009, 600, "Red")
@@ -6249,7 +6470,7 @@ class PauseMenu {
             if (this.first == 0) {
                 this.first = 1
                 this.enemies = [] //[new Gloobleglat(2300, 2660), new Gloobleglat(2560, 2800), new Gloobleglat(2860, 2660), new Gloobleglat(2300 + 900, 2560), new Gloobleglat(2560, 2800 + 900), new Gloobleglat(2860 + 900, 2560 + 900)]
-               
+
 
 
                 const engine = new Part(4800, 4800, 0)
@@ -6282,7 +6503,7 @@ class PauseMenu {
                 fuelpart.body.radius *= .75
                 this.enemies.push(fuelpart)
 
-                const clockpart =new Part(5200, 4143, 7)
+                const clockpart = new Part(5200, 4143, 7)
                 clockpart.body.color = "#FFFFFF"
                 // clockpart.body.radius *= .75
                 clockpart.body.radius *= 2
@@ -6294,111 +6515,111 @@ class PauseMenu {
                 this.enemies.push(warjar)
 
 
-                const brainjar = new Part(4467, 6529,  9)
+                const brainjar = new Part(4467, 6529, 9)
                 brainjar.body.color = "#FF8844"
                 this.enemies.push(brainjar)
 
 
-                const mirrorjar = new Part(9000, 9000,  10)
+                const mirrorjar = new Part(9000, 9000, 10)
                 mirrorjar.body.color = "#090909"
                 mirrorjar.body.radius = 39
                 this.enemies.push(mirrorjar)
 
 
 
-                const radarpart =  new Part(1111, 1111,  11)
+                const radarpart = new Part(1111, 1111, 11)
                 radarpart.body.color = "#000000"
                 radarpart.body.radius = 35
                 this.enemies.push(radarpart)
 
 
 
-                const drivepart = new Part(8100, 6900,  12)
+                const drivepart = new Part(8100, 6900, 12)
                 drivepart.body.color = "#00DD55"
                 drivepart.body.radius = 25
                 this.enemies.push(drivepart)
 
-                const boider = new Part(1450, 9500,  13)
+                const boider = new Part(1450, 9500, 13)
                 boider.body.color = "#AAFFAA"
                 boider.body.radius = 35
                 this.enemies.push(boider)
 
-                const comber = new Part(9000, 6000,  14)
+                const comber = new Part(9000, 6000, 14)
                 comber.body.color = "#090919"
                 comber.body.radius = 40
                 this.enemies.push(comber)
 
-                const labb = new Part(7100, 3000,  15)
+                const labb = new Part(7100, 3000, 15)
                 labb.body.color = "#090919"
                 labb.body.radius = 25
                 this.enemies.push(labb)
 
-                const fuleline = new Part(7200, 9800,  16)
+                const fuleline = new Part(7200, 9800, 16)
                 fuleline.body.color = "#FFFFFF"
                 fuleline.body.radius = 25
                 this.enemies.push(fuleline)
 
-                const drone = new Part(5120, 9800,  17)
+                const drone = new Part(5120, 9800, 17)
                 drone.body.color = "#090909"
                 drone.body.radius = 41
                 this.enemies.push(drone)
 
-                const filter = new Part(3200, 6000,  18)
+                const filter = new Part(3200, 6000, 18)
                 filter.body.color = "#090909"
                 filter.body.radius = 25
                 this.enemies.push(filter)
 
-                const hole = new Part(5623, 3800,  19)
+                const hole = new Part(5623, 3800, 19)
                 hole.body.color = "#090909"
                 hole.body.radius = 25
                 this.enemies.push(hole)
 
-                const lamp = new Part(4623, 3800,  20)
+                const lamp = new Part(4623, 3800, 20)
                 lamp.body.color = "#090909"
                 lamp.body.radius = 25
                 this.enemies.push(lamp)
 
-                const heater = new Part(4200, 7657,  21)
+                const heater = new Part(4200, 7657, 21)
                 heater.body.color = "#FFAA00"
                 heater.body.radius = 25
                 this.enemies.push(heater)
 
-                const tv = new Part(5252, 7512,  22)
+                const tv = new Part(5252, 7512, 22)
                 tv.body.color = "#777777"
                 tv.body.radius = 25
                 this.enemies.push(tv)
 
-                const waterparts = new Part(2800, 8712,  23)
+                const waterparts = new Part(2800, 8712, 23)
                 waterparts.body.color = "#0000ff"
                 waterparts.body.radius = 32
                 this.enemies.push(waterparts)
 
-                const hydro = new Part(2800, 8012,  24)
+                const hydro = new Part(2800, 8012, 24)
                 hydro.body.color = "#00FF00"
                 hydro.body.radius = 20
                 this.enemies.push(hydro)
 
-                const ammo = new Part(6524, 2706,  25)
+                const ammo = new Part(6524, 2706, 25)
                 ammo.body.color = "#00FF00"
                 ammo.body.radius = 25
                 this.enemies.push(ammo)
 
-                const heart = new Part(4000, 5038,  26)
+                const heart = new Part(4000, 5038, 26)
                 heart.body.color = "#00FFFF"
                 heart.body.radius = 25
                 this.enemies.push(heart)
 
-                const prop = new Part(1960, 5211,  27)
+                const prop = new Part(1960, 5211, 27)
                 prop.body.color = "#00FFFF00"
                 prop.body.radius = 25
                 this.enemies.push(prop)
 
-                const stereo = new Part(890, 980,  28)
+                const stereo = new Part(890, 980, 28)
                 stereo.body.color = "#000000"
                 stereo.body.radius = 20
                 this.enemies.push(stereo)
 
-                const target = new Part(1500, 400,  29)
+                const target = new Part(1500, 400, 29)
                 target.body.color = "#000000"
                 target.body.radius = 40
                 this.enemies.push(target)
@@ -6416,8 +6637,8 @@ class PauseMenu {
                 //     this.enemies[t].body.y = y
                 //     x+=130
                 // }
-                
-               
+
+
                 for (let t = 0; t < 8; t++) {
                     const plug = new Crab(3200 + ((Math.random() - .5) * 400), 3200 + ((Math.random() - .5) * 400), ['red', "magenta", "orange"])
                     plug.body.x *= 2
@@ -6457,6 +6678,13 @@ class PauseMenu {
 
                 for (let t = 0; t < 200; t++) {
                     const plug = new Ploorenab(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
+                    plug.body.x *= 2
+                    plug.body.y *= 2
+                    this.enemies.push(plug)
+                }
+
+                for (let t = 0; t < 100; t++) {
+                    const plug = new HotBomb(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
                     plug.body.x *= 2
                     plug.body.y *= 2
                     this.enemies.push(plug)
@@ -6692,14 +6920,14 @@ class PauseMenu {
             }
             this.body.friction = 0.15
 
-            if(this.health <= 0){
+            if (this.health <= 0) {
 
                 this.health = 0
-                this.body.xmom += Math.cos(this.playlink.angle())*20
-                this.body.ymom += Math.sin(this.playlink.angle())*20
-                if(this.c3.doesPerimeterTouch(this.body)){
+                this.body.xmom += Math.cos(this.playlink.angle()) * 20
+                this.body.ymom += Math.sin(this.playlink.angle()) * 20
+                if (this.c3.doesPerimeterTouch(this.body)) {
                     this.health = this.maxhealth
-                }else{
+                } else {
                     this.body.frictiveMove()
                 }
             }
@@ -6783,14 +7011,14 @@ class PauseMenu {
             this.seekline = new LineOP(this.seek, this.body, "magenta", 1)
             this.angf = this.seekline.angle()
 
-            this.pointeredge = new PointD(this.seek.x-(Math.cos(this.angf)*this.seek.radius), this.seek.y-(Math.sin(this.angf)*this.seek.radius))
+            this.pointeredge = new PointD(this.seek.x - (Math.cos(this.angf) * this.seek.radius), this.seek.y - (Math.sin(this.angf) * this.seek.radius))
 
 
             this.seeklineedge = new LineOP(this.pointeredge, this.body, "magenta", 2)
 
-            if(this.seek.doesPerimeterTouch(this.body)){
+            if (this.seek.doesPerimeterTouch(this.body)) {
 
-            }else{
+            } else {
                 this.seeklineedge.draw()
             }
 
@@ -6845,18 +7073,65 @@ class PauseMenu {
                         if (this.sproutventory[k].grounded != 1) {  //&& (this.sproutventory[k].hittime % 2 == 0 || this.sproutventory[k].fly > 0)
                             const len = this.sproutventory[k].elinks[t].hypotenuse()
                             const angle = this.sproutventory[k].elinks[t].angle()
+
+                            // if (len < 50) {
+                            //     this.enemies[k].active = 1
+                            // }
                             if (len > 400) {
                                 continue
                             }
-                            if (len < Math.min((this.enemies[t].body.radius * 5), (45+this.enemies[t].body.radius)) && this.enemies[t].body.capped != 1) {
-                                if (this.sproutventory[k].fly > 0) {
-                                    this.sproutventory[k].body.xmom -= Math.cos(angle) * 0.2
-                                    this.sproutventory[k].body.ymom -= Math.sin(angle) * 0.2
-                                } else if (this.sproutventory[k].attent < 1) {
-                                    this.sproutventory[k].body.xmom -= Math.cos(angle) * 2.2
-                                    this.sproutventory[k].body.ymom -= Math.sin(angle) * 2.2
+                            if (this.enemies[t].bomb != 1) {
+                                if (len < Math.min((this.enemies[t].body.radius * 5), (45 + this.enemies[t].body.radius)) && this.enemies[t].body.capped != 1) {
+                                    if (this.sproutventory[k].fly > 0) {
+                                        this.sproutventory[k].body.xmom -= Math.cos(angle) * 0.2
+                                        this.sproutventory[k].body.ymom -= Math.sin(angle) * 0.2
+                                    } else if (this.sproutventory[k].attent < 1) {
+                                        this.sproutventory[k].body.xmom -= Math.cos(angle) * 2.2
+                                        this.sproutventory[k].body.ymom -= Math.sin(angle) * 2.2
+                                    }
+                                }
+                            } else {
+                                if ((len < Math.min((this.enemies[t].body.radius * 5), (65 + this.enemies[t].body.radius)) && this.enemies[t].body.capped != 1)) {
+                                    // if (this.sproutventory[k].clingTo.bomb == 1) {
+                                    // }
+                                    // if (this.enemies[t].bomb == 1) {
+
+                                    if (this.sproutventory[k].type != 2) {
+                                        if (this.sproutventory[k].cling == 1) {
+                                            this.sproutventory[k].cling = 0
+                                            this.sproutventory[k].body.xmom += Math.cos(angle) * 5.2
+                                            this.sproutventory[k].body.ymom += Math.sin(angle) * 5.2
+                                        }
+                                        if (this.enemies[t].blast == 1) {
+                                            if (this.sproutventory[k].body.doesPerimeterTouch(this.enemies[t].body)) {
+                                                if (this.sproutventory[k].bloomdriptimer <= 0) {
+                                                    if (this.sproutventory[k].bloom <= 0) {
+                                                        this.sproutventory[k].marked = 20
+                                                        this.sproutventory[k].body.xmom = 0
+                                                        this.sproutventory[k].body.ymom = 0
+                                                        this.sproutventory[k].body.friction = 0
+                                                    } else {
+                                                        this.sproutventory[k].bloomdriptimer = 20
+                                                        this.sproutventory[k].bloom -= 1
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        if (this.sproutventory[k].fly > 0) {
+                                            this.sproutventory[k].body.xmom += Math.cos(angle) * 0.2
+                                            this.sproutventory[k].body.ymom += Math.sin(angle) * 0.2
+                                        } else {
+                                            this.sproutventory[k].body.xmom += Math.cos(angle) * 2.2
+                                            this.sproutventory[k].body.ymom += Math.sin(angle) * 2.2
+                                        }
+                                    }
+                                    // }
+                                } else {
                                 }
                             }
+
+
+
 
 
                             if (this.enemies[t].body.doesPerimeterTouch(this.sproutventory[k].body)) {
@@ -6886,22 +7161,23 @@ class PauseMenu {
                                 }
 
                                 if (this.clingfilm == 1 || this.sproutventory[k].fly > 0 || this.sproutventory[k].attent <= 0) {
-                                    if (this.sproutventory[k].cling != 1) {
+                                    if (this.sproutventory[k].cling != 1 && this.enemies[t].bomb != 1) {
                                         this.sproutventory[k].clingTo = this.enemies[t].body
                                         this.sproutventory[k].clingx = -(this.enemies[t].body.x - this.sproutventory[k].body.x)
                                         this.sproutventory[k].clingy = -(this.enemies[t].body.y - this.sproutventory[k].body.y)
                                     }
                                     if (this.enemies[t].spliceout != 1) {
                                         if (this.sproutventory[k].cling != 1) {
-                                            if (this.enemies[t].nectar != 1) {
+                                            if (this.enemies[t].nectar != 1 && this.enemies[t].bomb != 1) {
                                                 this.sproutventory[k].cling = 1
                                             }
                                         }
                                     }
                                 } else {
-
-                                    this.sproutventory[k].body.xmom += Math.cos(angle) * 2.2
-                                    this.sproutventory[k].body.ymom += Math.sin(angle) * 2.2
+                                    if (this.enemies[t].bomb != 1) {
+                                        this.sproutventory[k].body.xmom += Math.cos(angle) * 2.2
+                                        this.sproutventory[k].body.ymom += Math.sin(angle) * 2.2
+                                    }
                                 }
 
                                 if (this.enemies[t].pulse == 1) {
@@ -6962,9 +7238,9 @@ class PauseMenu {
                     this.seek.radius += 2
                 }
                 // if (keysPressed['u'] || keysPressed['q'] || gamepadAPI.buttonsStatus.includes('Right-Trigger') ){
-                    // if(this.guiding != 1){
-                    whistle.play()
-                    // }
+                // if(this.guiding != 1){
+                whistle.play()
+                // }
                 // }
             } else {
                 this.seek.radius = 8
@@ -6990,11 +7266,11 @@ class PauseMenu {
                                 this.sproutventory[t].cling = 0
                                 this.sproutventory[t].hittime = 1
                                 this.sproutventory[t].clingTo.capped = 1
-                            }else{
+                            } else {
                                 this.sproutventory[t].clingTo.capped = 0
-                                if (omegahash[`${this.sproutventory[t].clingTo.k}`].carriers >= ((1 / this.sproutventory[t].clingTo.weight) * 2)-1) {
-                                this.sproutventory[t].hittime = 1
-                                this.sproutventory[t].clingTo.capped = 1
+                                if (omegahash[`${this.sproutventory[t].clingTo.k}`].carriers >= ((1 / this.sproutventory[t].clingTo.weight) * 2) - 1) {
+                                    this.sproutventory[t].hittime = 1
+                                    this.sproutventory[t].clingTo.capped = 1
                                 }
                             }
                             omegahash[`${this.sproutventory[t].clingTo.k}`].carriers++
@@ -7062,7 +7338,7 @@ class PauseMenu {
                     }
                 }
                 if (this.sproutventory[t].grounded != 1 && this.sproutventory[t].fly <= 0 && this.sproutventory[t].hittime % 3 == 0) {
-                    for (let k = Math.max(t-1,0); k < this.sproutventory.length; k++) {  //not t? 0?
+                    for (let k = Math.max(t - 1, 0); k < this.sproutventory.length; k++) {  //not t? 0?
                         if (this.sproutventory[k].grounded != 1) {
                             if (this.sproutventory[k].attent == 1) {
 
@@ -7077,18 +7353,20 @@ class PauseMenu {
                                                 }
                                             } else {
                                                 // if (this.sproutventory[t].playlink.hypotenuse() < 750) { //290???? does the other one even fire now that k = t?
-                                                    this.sproutventory[t].attent = 1
+                                                this.sproutventory[t].attent = 1
                                                 // }
                                             }
                                         }
-                                        if (this.sproutventory[t].type != this.sproutventory[k].type) {
-                                            const angle = this.sproutventory[t].links[k].angle()
-                                            this.sproutventory[t].body.xmom += Math.cos(angle) * this.magsetoff  //1
-                                            this.sproutventory[t].body.ymom += Math.sin(angle) * this.magsetoff //1
-                                        } else {
-                                            const angle = this.sproutventory[t].links[k].angle()
-                                            this.sproutventory[t].body.xmom += Math.cos(angle) * this.magsetoffsmall //.2
-                                            this.sproutventory[t].body.ymom += Math.sin(angle) * this.magsetoffsmall //.2
+                                        if (this.sproutventory[t].clingTo.bomb != 1) {
+                                            if (this.sproutventory[t].type != this.sproutventory[k].type) {
+                                                const angle = this.sproutventory[t].links[k].angle()
+                                                this.sproutventory[t].body.xmom += Math.cos(angle) * this.magsetoff  //1
+                                                this.sproutventory[t].body.ymom += Math.sin(angle) * this.magsetoff //1
+                                            } else {
+                                                const angle = this.sproutventory[t].links[k].angle()
+                                                this.sproutventory[t].body.xmom += Math.cos(angle) * this.magsetoffsmall //.2
+                                                this.sproutventory[t].body.ymom += Math.sin(angle) * this.magsetoffsmall //.2
+                                            }
                                         }
                                     }
                                 } else if (t < k) {
@@ -7103,18 +7381,20 @@ class PauseMenu {
                                                 }
                                             } else {
                                                 // if (this.sproutventory[t].playlink.hypotenuse() < 750) { //290????
-                                                    this.sproutventory[t].attent = 1
+                                                this.sproutventory[t].attent = 1
                                                 // }
                                             }
                                         }
-                                        if (this.sproutventory[t].type != this.sproutventory[k].type) {
-                                            const angle = this.sproutventory[t].links[k].angleM()
-                                            this.sproutventory[t].body.xmom += Math.cos(angle) * this.magsetoff  //1
-                                            this.sproutventory[t].body.ymom += Math.sin(angle) * this.magsetoff //1
-                                        } else {
-                                            const angle = this.sproutventory[t].links[k].angleM()
-                                            this.sproutventory[t].body.xmom += Math.cos(angle) * this.magsetoffsmall //.2
-                                            this.sproutventory[t].body.ymom += Math.sin(angle) * this.magsetoffsmall //.2
+                                        if (this.sproutventory[t].clingTo.bomb != 1) {
+                                            if (this.sproutventory[t].type != this.sproutventory[k].type) {
+                                                const angle = this.sproutventory[t].links[k].angleM()
+                                                this.sproutventory[t].body.xmom += Math.cos(angle) * this.magsetoff  //1
+                                                this.sproutventory[t].body.ymom += Math.sin(angle) * this.magsetoff //1
+                                            } else {
+                                                const angle = this.sproutventory[t].links[k].angleM()
+                                                this.sproutventory[t].body.xmom += Math.cos(angle) * this.magsetoffsmall //.2
+                                                this.sproutventory[t].body.ymom += Math.sin(angle) * this.magsetoffsmall //.2
+                                            }
                                         }
                                     }
                                 }
@@ -7237,7 +7517,7 @@ class PauseMenu {
 
                 // this.sproutventory[t].body.frictiveMove()
                 if (keysPressed['o'] || keysPressed['e'] || gamepadAPI.buttonsStatus.includes('A') || gamepadAPI.buttonsStatus.includes('Left-Trigger')) {
-                    if (length < (this.supersize*2.2)) {
+                    if (length < (this.supersize * 2.2)) {
                         if (this.sproutventory[t].grounded == 1) {
                             this.haspicked++
                             this.sproutventory[t].grounded = -3
@@ -7342,8 +7622,8 @@ class PauseMenu {
             }
 
             canvas_context.drawImage(this.captain, 0, 0, this.captain.width, this.captain.height, Math.round(this.body.x - this.body.radius), Math.round(this.body.y - this.body.radius), 2 * this.body.radius, 2 * this.body.radius)
-           
-           
+
+
 
 
             this.smack--
@@ -7367,13 +7647,13 @@ class PauseMenu {
 
 
             canvas_context.translate(xdiff, ydiff)
-            if(gamepadAPI.buttonsStatus.includes('Y') || keysPressed['m']){
-                megamap_context.drawImage(this.worldmap, 0, 0, 5120,5120, 0,0,10240,10240) ///, 1024, 1024, 0, 0, 10240, 10240)
+            if (gamepadAPI.buttonsStatus.includes('Y') || keysPressed['m']) {
+                megamap_context.drawImage(this.worldmap, 0, 0, 5120, 5120, 0, 0, 10240, 10240) ///, 1024, 1024, 0, 0, 10240, 10240)
                 // megamap_context.drawImage(canvas, 0,0, 1280,720, (this.body.x + 200) + (Math.max(throbert.body.x-640, 0)/32), (this.body.y-200) + (Math.max(throbert.body.y-360, 0)/32), (1280/32),(720/32))
-                megamap_context.drawImage(canvas, 0,0, 1280,720,  (Math.max(throbert.body.x-640, 0)), (Math.max(throbert.body.y-360, 0)), (1280),(720))
-                megamap_context.drawImage(this.captain, 0, 0, this.captain.width, this.captain.height, Math.round(this.body.x - (this.body.radius*20)), Math.round(this.body.y - (this.body.radius*20)), 40 * this.body.radius, 40 * this.body.radius)
-                canvas_context.drawImage(megamap, 0, 0, 10240,10240, this.body.x + 200, this.body.y-200, 320,320) ///, 1024, 1024, 0, 0, 10240, 10240)
-    
+                megamap_context.drawImage(canvas, 0, 0, 1280, 720, (Math.max(throbert.body.x - 640, 0)), (Math.max(throbert.body.y - 360, 0)), (1280), (720))
+                megamap_context.drawImage(this.captain, 0, 0, this.captain.width, this.captain.height, Math.round(this.body.x - (this.body.radius * 20)), Math.round(this.body.y - (this.body.radius * 20)), 40 * this.body.radius, 40 * this.body.radius)
+                canvas_context.drawImage(megamap, 0, 0, 10240, 10240, this.body.x + 200, this.body.y - 200, 320, 320) ///, 1024, 1024, 0, 0, 10240, 10240)
+
             }
 
 
@@ -7435,14 +7715,14 @@ class PauseMenu {
 
         canvas_context.clearRect(-1000000, -1000000, canvas.width * 10000000, canvas.height * 10000000)
         gamepadAPI.update()
-        if(throbert.pause.paused == 1){
+        if (throbert.pause.paused == 1) {
             throbert.pause.draw()
-            if(keysPressed['r']){
+            if (keysPressed['r']) {
                 throbert.pause.paused = 0
             }
             return
-        }else{
-            if(keysPressed['p']){
+        } else {
+            if (keysPressed['p']) {
                 // throbert.pause.paused = 1
             }
         }
@@ -7453,7 +7733,7 @@ class PauseMenu {
             now = Date.now()
         }
         frames++
-   
+
         throbert.draw()
         // if (keysPressed['-'] && recording == 0) {
         //     recording = 1
