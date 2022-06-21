@@ -1493,7 +1493,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
             this.worldmap = new Image()
-            this.worldmap.src = "mapscan.png"
+            this.worldmap.src = "pikmap4206.png"
 
             // canvas_context.drawImage(this.worldmap, 0,0,128,128, -640,-940,2560,2560)
     
@@ -1512,13 +1512,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
         for(let t = 0;t<imagedata.data.length;t+=4){
             if(imagedata.data[t]==imagedata.data[t+1]){
                 let point = {}
-                point.x = (Math.floor(t/4)%1024)*10
-                point.y = Math.floor(Math.floor(t/4)/1024)*10
+                // point.x = (Math.floor(t/4)%1024)*10
+                // point.y = Math.floor(Math.floor(t/4)/1024)*10
                 // point.w = 10
                 // point.h = 10
                 // point.c  = `rgb(${imagedata.data[t]}, ${imagedata.data[t+1]}, ${imagedata.data[t+2]})`
-                point.z =((((imagedata.data[t] + imagedata.data[t+1])/2)/255))
-                output.push(point)
+                // point.z =((((imagedata.data[t] + imagedata.data[t+1])/2)/255))
+                output.push(Math.floor(((((imagedata.data[t] + imagedata.data[t+1])/2)/255))*100)/100)
             }
         }
 

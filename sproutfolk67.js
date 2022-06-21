@@ -493,9 +493,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.color = color
             this.xmom = 0
             this.ymom = 0
+            this.sxmom = 0
+            this.symom = 0
             this.stroke = stroke
             this.strokeWidth = strokeWidth
+            this.friction = .9
             this.fill = fill
+            this.rect = 1
         }
         draw() {
             canvas_context.fillStyle = this.color
@@ -504,6 +508,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
         move() {
             this.x += this.xmom
             this.y += this.ymom
+        }
+        smove() {
+            this.x += this.sxmom
+            this.y += this.symom
+        }
+        frictiveMove() {
+            this.x += this.xmom
+            this.y += this.ymom
+            this.xmom *= this.friction
+            this.ymom *= this.friction
         }
         isPointInside(point) {
             if (point.x >= this.x) {
@@ -1708,7 +1722,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
     function setUp(canvas_pass, style = "#000055") {
         canvas = canvas_pass
-        // video_recorder = new CanvasCaptureToWEBM(canvas, 3000000);
+        // video_recorder = new CanvasCaptureToWEBM(canvas, 4000000);
         canvas_context = canvas.getContext('2d');
         // canvas_context.imageSmoothingEnabled = true
         canvas.style.background = style
@@ -2196,7 +2210,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         const link = new LineOP(this.raypoint, throbert.road[`${t},${k}`])
 
                         const hyp = link.hypotenuse()
-                        const angle = link.angle()
+                        // const angle = link.angle()
                         if (hyp <= ten) {
                             // if (Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z) <= .0299) {
                             // } else {
@@ -2282,30 +2296,61 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 if (this.glop == this.body || (Math.random() < .05)) { //.33 //|| (Math.random() < .05
                     for (let t = 0; t < throbert.nodes.length; t++) {
                         if (throbert.nodes[t].priority <= pr) {
-                            if (throbert.nodes[t].equity.doesPerimeterTouch(this.clingTo)) {
-                                if (this.clingTo.supralinks[t].hypotenuse() < relmin) {
-                                    if (throbert.path2(this.clingTo, throbert.nodes[t])) {
-                                        relmin = this.clingTo.supralinks[t].hypotenuse()
-                                        this.glop = throbert.nodes[t]
-                                        this.gloppath = 0
-                                        this.boglpath = 0
-                                        pr = throbert.nodes[t].priority
+                            if (this.clingTo.rect == 1) {
+                                this.clingTo.center.radius = 15
+                                if (throbert.nodes[t].equity.doesPerimeterTouch(this.clingTo.center)) {
+                                    if (this.clingTo.supralinks[t].hypotenuse() < relmin) {
+                                        if (throbert.path2(this.clingTo.center, throbert.nodes[t])) {
+                                            relmin = this.clingTo.supralinks[t].hypotenuse()
+                                            this.glop = throbert.nodes[t]
+                                            this.gloppath = 0
+                                            this.boglpath = 0
+                                            pr = throbert.nodes[t].priority
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (throbert.nodes[t].equity.doesPerimeterTouch(this.clingTo)) {
+                                    if (this.clingTo.supralinks[t].hypotenuse() < relmin) {
+                                        if (throbert.path2(this.clingTo, throbert.nodes[t])) {
+                                            relmin = this.clingTo.supralinks[t].hypotenuse()
+                                            this.glop = throbert.nodes[t]
+                                            this.gloppath = 0
+                                            this.boglpath = 0
+                                            pr = throbert.nodes[t].priority
+                                        }
                                     }
                                 }
                             }
                         }
+                        if (this.clingTo.rect == 1) {
 
-                        if (throbert.nodes[t].small.doesPerimeterTouch(this.clingTo)) {
-                            this.glop = throbert.nodes[t]
-                            // this.clingTo.color = getRandomLightColor()
-                            for (let n = 0; n < this.glop.neighbors.length; n++) {
-                                if (this.glop.neighbors[n].priority < this.glop.priority) {
-                                    this.bogl = this.glop.neighbors[n]
-                                    this.gloppath = 0
-                                    this.boglpath = 1
+                            if (throbert.nodes[t].small.doesPerimeterTouch(this.clingTo.center)) {
+                                this.glop = throbert.nodes[t]
+                                // this.clingTo.color = getRandomLightColor()
+                                for (let n = 0; n < this.glop.neighbors.length; n++) {
+                                    if (this.glop.neighbors[n].priority < this.glop.priority) {
+                                        this.bogl = this.glop.neighbors[n]
+                                        this.gloppath = 0
+                                        this.boglpath = 1
+                                    }
                                 }
+                                break
                             }
-                            break
+                        } else {
+
+                            if (throbert.nodes[t].small.doesPerimeterTouch(this.clingTo)) {
+                                this.glop = throbert.nodes[t]
+                                // this.clingTo.color = getRandomLightColor()
+                                for (let n = 0; n < this.glop.neighbors.length; n++) {
+                                    if (this.glop.neighbors[n].priority < this.glop.priority) {
+                                        this.bogl = this.glop.neighbors[n]
+                                        this.gloppath = 0
+                                        this.boglpath = 1
+                                    }
+                                }
+                                break
+                            }
                         }
                     }
                 }
@@ -2313,21 +2358,42 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     return
                 }
                 if (this.gloppath == 0) {
-                    if (throbert.path2(this.clingTo, this.glop)) {
-                        const linkus = new LineOPD(this.clingTo, this.glop)
-                        // const linkus = new LineOP(this.clingTo, this.glop, "green", 2)
-                        const anfle = linkus.angle()
-                        airmail.x -= (((Math.cos(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
-                        airmail.y -= (((Math.sin(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
-                        // linkus.draw()
-                        this.gloppath = 1
+                    if (this.clingTo.rect == 1) {
+                        if (throbert.path2(this.clingTo.center, this.glop)) {
+                            const linkus = new LineOPD(this.clingTo.center, this.glop)
+                            // const linkus = new LineOP(this.clingTo, this.glop, "green", 2)
+                            const anfle = linkus.angle()
+                            airmail.x -= (((Math.cos(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
+                            airmail.y -= (((Math.sin(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
+                            // linkus.draw()
+                            this.gloppath = 1
+                        }
+                    } else {
+                        if (throbert.path2(this.clingTo, this.glop)) {
+                            const linkus = new LineOPD(this.clingTo, this.glop)
+                            // const linkus = new LineOP(this.clingTo, this.glop, "green", 2)
+                            const anfle = linkus.angle()
+                            airmail.x -= (((Math.cos(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
+                            airmail.y -= (((Math.sin(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
+                            // linkus.draw()
+                            this.gloppath = 1
+                        }
                     }
                 } else {
                     // const linkus = new LineOP(this.clingTo, this.glop, "yellow", 2)
-                    const linkus = new LineOPD(this.clingTo, this.glop)
-                    const anfle = linkus.angle()
-                    airmail.x -= (((Math.cos(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
-                    airmail.y -= (((Math.sin(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
+
+                    if (this.clingTo.rect == 1) {
+                        const linkus = new LineOPD(this.clingTo.center, this.glop)
+                        const anfle = linkus.angle()
+                        airmail.x -= (((Math.cos(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
+                        airmail.y -= (((Math.sin(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
+                    } else {
+
+                        const linkus = new LineOPD(this.clingTo, this.glop)
+                        const anfle = linkus.angle()
+                        airmail.x -= (((Math.cos(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
+                        airmail.y -= (((Math.sin(anfle) * this.clingTo.weight)) * .1234) * (1 + (this.bloom * .1))
+                    }
                     // linkus.draw()
                 }
                 if (this.boglpath == 0) {
@@ -2342,29 +2408,60 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     // if(cap == this.glop.priority){
                     //     //console.log(this.glop)
                     // }
-                    if (throbert.path2(this.clingTo, this.bogl)) {
-                        // const linkg = new LineOP(this.clingTo, this.bogl, "orange", 2)
-                        const linkg = new LineOPD(this.clingTo, this.bogl)
+
+                    if (this.clingTo.rect == 1) {
+                        if (throbert.path2(this.clingTo.center, this.bogl)) {
+                            // const linkg = new LineOP(this.clingTo, this.bogl, "orange", 2)
+                            const linkg = new LineOPD(this.clingTo.center, this.bogl)
+                            const anfleg = linkg.angle()
+                            airmail.x -= (((Math.cos(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                            airmail.y -= (((Math.sin(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                            this.boglpath = 1
+                            // linkg.draw()
+                        }
+                    } else {
+                        if (throbert.path2(this.clingTo, this.bogl)) {
+                            // const linkg = new LineOP(this.clingTo, this.bogl, "orange", 2)
+                            const linkg = new LineOPD(this.clingTo, this.bogl)
+                            const anfleg = linkg.angle()
+                            airmail.x -= (((Math.cos(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                            airmail.y -= (((Math.sin(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                            this.boglpath = 1
+                            // linkg.draw()
+                        }
+                    }
+                } else {
+
+
+                    if (this.clingTo.rect == 1) {
+                        const linkg = new LineOP(this.clingTo.center, this.bogl, "pink", 2)
                         const anfleg = linkg.angle()
                         airmail.x -= (((Math.cos(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
                         airmail.y -= (((Math.sin(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
-                        this.boglpath = 1
+                        // linkg.draw()
+                    } else {
+
+                        const linkg = new LineOP(this.clingTo, this.bogl, "pink", 2)
+                        const anfleg = linkg.angle()
+                        airmail.x -= (((Math.cos(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                        airmail.y -= (((Math.sin(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
                         // linkg.draw()
                     }
-                } else {
-                    const linkg = new LineOP(this.clingTo, this.bogl, "pink", 2)
-                    const anfleg = linkg.angle()
-                    airmail.x -= (((Math.cos(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
-                    airmail.y -= (((Math.sin(anfleg) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
-                    // linkg.draw()
 
                 }
 
 
                 if (this.camplink.hypotenuse() < 280) {
-                    const angle = this.camplink.angle()
-                    airmail.x -= (((Math.cos(angle) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
-                    airmail.y -= (((Math.sin(angle) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                    if (this.clingTo.rect == 1) {
+                        const angle = this.camplink.angle()
+                        airmail.x -= (((Math.cos(angle) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                        airmail.y -= (((Math.sin(angle) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                    } else {
+
+                        const angle = this.camplink.angle()
+                        airmail.x -= (((Math.cos(angle) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                        airmail.y -= (((Math.sin(angle) * this.clingTo.weight) * 1) * .3769) * (1 + (this.bloom * .1))
+                    }
                 }
 
 
@@ -2460,21 +2557,44 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             for (let t = Math.max(this.xcord - ten, 0); t < Math.min(this.xcord + 20, 10230); t += ten) {
                                 for (let k = Math.max(this.ycord - ten, 0); k < Math.min(this.ycord + 20, 10230); k += ten) {
                                     const link = new LineOP(this.body, throbert.road[`${t},${k}`])
-                                    const linkz = new LineOP(this.clingTo, throbert.road[`${t},${k}`])
-                                    if (this.clingTo.radius > 0) {
-                                        if (linkz.hypotenuse() <= 20 + this.clingTo.radius) {
-                                            if (Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z) <= .2) {
-                                            } else {
-                                                const angle = link.angle()
-                                                this.clingTo.x += Math.cos(angle) * .8
-                                                this.clingTo.y += Math.sin(angle) * .8
-                                                this.body.x += Math.cos(angle) * .8
-                                                this.body.y += Math.sin(angle) * .8
-                                                this.clingTo.xmom += Math.cos(angle) * .9
-                                                this.clingTo.ymom += Math.sin(angle) * .9
-                                                this.body.x += Math.cos(angle) * .8
-                                                this.body.y += Math.sin(angle) * .8
-                                                break
+                                    if (this.clingTo.rect == 1) {
+
+                                        const linkz = new LineOP(this.clingTo.center, throbert.road[`${t},${k}`])
+                                        if (this.clingTo.radius > 0) {
+                                            if (linkz.hypotenuse() <= 20 + this.clingTo.radius) {
+                                                if (Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z) <= .2) {
+                                                } else {
+                                                    const angle = link.angle()
+                                                    this.clingTo.x += Math.cos(angle) * .8
+                                                    this.clingTo.y += Math.sin(angle) * .8
+                                                    this.body.x += Math.cos(angle) * .8
+                                                    this.body.y += Math.sin(angle) * .8
+                                                    this.clingTo.xmom += Math.cos(angle) * .9
+                                                    this.clingTo.ymom += Math.sin(angle) * .9
+                                                    this.body.x += Math.cos(angle) * .8
+                                                    this.body.y += Math.sin(angle) * .8
+                                                    break
+                                                }
+                                            }
+                                        }
+                                    } else {
+
+                                        const linkz = new LineOP(this.clingTo, throbert.road[`${t},${k}`])
+                                        if (this.clingTo.radius > 0) {
+                                            if (linkz.hypotenuse() <= 20 + this.clingTo.radius) {
+                                                if (Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z) <= .2) {
+                                                } else {
+                                                    const angle = link.angle()
+                                                    this.clingTo.x += Math.cos(angle) * .8
+                                                    this.clingTo.y += Math.sin(angle) * .8
+                                                    this.body.x += Math.cos(angle) * .8
+                                                    this.body.y += Math.sin(angle) * .8
+                                                    this.clingTo.xmom += Math.cos(angle) * .9
+                                                    this.clingTo.ymom += Math.sin(angle) * .9
+                                                    this.body.x += Math.cos(angle) * .8
+                                                    this.body.y += Math.sin(angle) * .8
+                                                    break
+                                                }
                                             }
                                         }
                                     }
@@ -2716,6 +2836,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     }
                     this.body.radius *= .5
                 }
+            }
+            if (this.carryingbomb == 1) {
+                canvas_context.drawImage(hotbomb, (this.bomb.step % 8) * (hotbomb.width / 8), 0, hotbomb.width / 8, hotbomb.height, this.bomb.body.x - (this.bomb.body.radius * 2.0), this.bomb.body.y - (this.bomb.body.radius * 2.0), this.bomb.body.radius * 4.0, this.bomb.body.radius * 4.0)
+
             }
         }
     }
@@ -4017,15 +4141,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.symom *= .8
             }
         }
-        
+
         healthDraw() {
             this.healthbar = new Healthbox(this.body.x - 8, this.body.y + (this.body.radius * 1.2), 16, 16, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
             if (this.health != this.maxhealth && this.marked != 1) {
                 this.healthbar.draw((this.health / this.maxhealth))
             }
         }
-        
-        
+
+
 
         draw() {
             if (this.playlink.hypotenuse() > 1200) {
@@ -4392,8 +4516,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.healthbar.draw((this.health / this.maxhealth))
             }
         }
-        
-        
+
+
         draw() {
             if (this.playlink.hypotenuse() > 1200) {
                 return
@@ -4779,11 +4903,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.healthbar.draw((this.health / this.maxhealth))
             }
         }
-        
-        
+
+
         draw() {
 
-            if (this.playlink.hypotenuse() > 750) {
+            if (this.playlink.hypotenuse() > 750 && !this.beaming == 1) {
                 return
             }
             if (this.health <= 0) {
@@ -5311,6 +5435,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     const ploosheet = new Image()
     ploosheet.src = "ploosheet.png"
+    const wallsheet = new Image()
+    wallsheet.src = "wallsheet.png"
 
     class Ploorenab {
         constructor(x, y) {
@@ -5457,6 +5583,174 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
     }
+    class Wallatoid {
+        constructor(x, y) {
+            this.body = new Rectangle(x, y, 30, 140, "green")
+            this.body.radius = 15
+            this.bodyarea = new Circle(x, y, 150, "green")
+            this.go = this.body
+            this.health = 10000
+            this.maxhealth = this.health
+            this.value = 30
+            this.body.timer = 999999999999 * 999999999999
+            this.body.health = this.health
+            this.weight = 30
+            this.body.weight = 1 / this.weight
+            this.body.friction = .89
+            this.playlink = new LineOPD(this.body, throbert.body)
+            this.step = Math.floor(Math.random() * 18)
+            this.type = Math.floor(Math.random() * 2)
+            this.firstdead = 0
+            this.center = new PointD(this.body.x + this.body.width * .5, this.body.y + this.body.height * .5)
+            this.body.center = new PointD(this.body.x + this.body.width * .5, this.body.y + this.body.height * .5)
+        }
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x, this.body.y + ((Math.max(0, this.body.height)) * 1.2), 12, 12, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
+            }
+        }
+        speedlimit() {
+            let brf = 0
+            while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit) {
+                brf++
+                if (brf > 8) {
+                    break
+                }
+                this.body.xmom *= .8
+                this.body.ymom *= .8
+                this.body.sxmom *= .8
+                this.body.symom *= .8
+            }
+        }
+        draw() {
+            if (this.playlink.hypotenuse() > 750) {
+                return
+            }
+            if (this.health <= 0) {
+                this.body.smove()
+
+
+                if (this.firstdead == 0) {
+                    this.firstdead = 1
+                    for (let t = 0; t < enemysounds.length; t++) {
+                        if (enemysounds[t].paused) {
+                            enemysounds[t].play()
+                            break
+                        }
+                    }
+                }
+            } else {
+
+                // for (let x = 0; x < 20; x++) {
+                //     // this.body.frictiveMove10()
+                //     this.xcord = Math.floor((this.body.x) * .1) * ten
+                //     this.xcord = Math.max(this.xcord, 0)
+                //     this.xcord = Math.min(this.xcord, 10230)
+                //     this.ycord = Math.floor((this.body.y) * .1) * ten
+                //     this.ycord = Math.max(this.ycord, 0)
+                //     this.ycord = Math.min(this.ycord, 10230)
+                //     // ////console.log(this.xcord, this.ycord)
+                //     if (throbert.road[`${this.xcord},${this.ycord}`].doesPerimeterTouch(this.body)) {
+                //         for (let t = Math.max(this.xcord - ten, 0); t < Math.min(this.xcord + 20, 10230); t += ten) {
+                //             for (let k = Math.max(this.ycord - ten, 0); k < Math.min(this.ycord + 20, 10230); k += ten) {
+
+                //                 // if (true) {
+                //                 const link = new LineOPD(this.body, throbert.road[`${t},${k}`])
+
+                //                 if (Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z) <= .09) {
+                //                 } else {
+                //                     const hyp = link.hypotenuse()
+                //                     const angle = link.angle()
+                //                     if (hyp <= ten + this.body.radius) {
+                //                         if (hyp <= ten + this.body.radius) {
+                //                             if (Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z) <= .159) {
+
+                //                             } else {
+                //                                 this.body.xmom = Math.cos(angle) * 2
+                //                                 this.body.ymom = Math.sin(angle) * 2
+                //                                 this.go = new Point(this.body.x + ((Math.random() - .5) * 300), this.body.y + ((Math.random() - .5) * 300))
+                //                             }
+                //                         } else if (hyp <= ten) {
+                //                             if (Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z) <= .159) {
+
+                //                             } else {
+                //                                 this.body.xmom = Math.cos(angle) * 2
+                //                                 this.body.ymom = Math.sin(angle) * 2
+                //                                 this.go = new Point(this.body.x + ((Math.random() - .5) * 300), this.body.y + ((Math.random() - .5) * 300))
+                //                             }
+                //                         }
+                //                     }
+                //                     // }
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+            }
+            if (this.health > 0) {
+
+                if (this.type == 1) {
+                    this.step++
+                } else {
+                    this.step += 17
+                }
+                if (this.body.doesPerimeterTouch(this.go)) {
+                    this.go = new Point(this.body.x + ((Math.random() - .5) * 300), this.body.y + ((Math.random() - .5) * 300))
+                    let j = 0
+                    while (!this.go.doesPerimeterTouch(this.bodyarea)) {
+                        j++
+                        if (j > ten) {
+                            break
+                        }
+                        this.go = new Point(this.body.x + ((Math.random() - .5) * 300), this.body.y + ((Math.random() - .5) * 300))
+                    }
+                } else {
+                    if (this.health == this.maxhealth) {
+                        // this.body.xmom -= Math.sign(this.body.x - this.go.x) * 0.1
+                        // this.body.ymom -= Math.sign(this.body.y - this.go.y) * 0.1
+                    } else {
+                        // this.body.xmom -= Math.sign(this.body.x - this.go.x) * 0.2
+                        // this.body.ymom -= Math.sign(this.body.y - this.go.y) * 0.2
+                    }
+                }
+            }
+            this.body.timer--
+            if (this.body.timer <= 0) {
+                this.spliceout = 1
+            }
+            //this.healthDraw()
+            // this.body.draw()
+
+            this.center.x = this.body.x + (this.body.width * .5)
+            this.center.y = this.body.y + (this.body.height * .5)
+            this.body.center.x = this.body.x + (this.body.width * .5)
+            this.body.center.y = this.body.y + (this.body.height * .5)
+            // this.body.center = new PointD(this.body.x+this.body.width*.5, this.body.y+this.body.height*.5)
+
+
+            canvas_context.drawImage(wallsheet, 30 * (this.step % 18), 0, 30, 140, this.body.x, this.body.y, 30, 140)
+            this.body.health = this.health
+
+            const indexer = throbert.enemies.indexOf(this)
+            for (let t = 0; t < throbert.sproutventory.length; t++) {
+                if (throbert.sproutventory[t].elinks[indexer] <= this.body.width + this.body.height) {
+                    if (this.body.doesPerimeterTouch(throbert.sproutventory[t].body)) {
+                        this.health -= 1
+                        // const angle = this.playlink.angle()
+                        throbert.sproutventory[t].body.xmom += (throbert.sproutventory[t].body.x - this.center.x) / (this.body.height * .05)
+                        throbert.sproutventory[t].body.ymom += (throbert.sproutventory[t].body.y - this.center.y) / (this.body.height * .05)
+                    }
+                }
+            }
+
+            if (this.body.doesPerimeterTouch(throbert.body)) {
+                // const angle = this.playlink.angle()
+                throbert.body.xmom += (throbert.body.x - this.center.x) / (this.body.width * .05)
+                throbert.body.ymom += (throbert.body.y - this.center.y) / (this.body.height * .05)
+            }
+        }
+    }
 
 
     class MenuButton {
@@ -5570,9 +5864,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         this.marked = 3
                     }
                     this.blast = 1
-                    for(let t = 0;t<throbert.enemies.length;t++){
-                        if(this.body.doesPerimeterTouch(throbert.enemies[t].body)){
-                            throbert.enemies[t].health -= (throbert.enemies[t].maxhealth*.1) + 50
+                    for (let t = 0; t < throbert.enemies.length; t++) {
+                        if (throbert.enemies[t].body.doesPerimeterTouch(this.body)) {
+                            throbert.enemies[t].health -= (throbert.enemies[t].maxhealth * .02) + 540
                         }
                     }
                     this.body.color = "#FFAAAA55"
@@ -5601,15 +5895,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             if (this.body.doesPerimeterTouch(throbert.sproutventory[t].body)) {
                                 if (throbert.sproutventory[t].busy != 1) {
                                     if (throbert.sproutventory[t].carryingbomb >= 0 && this.picked != 1) {
-                                    this.cling = 1
-                                    this.clingTo = throbert.sproutventory[t]
-                                    this.active = 2
-                                    throbert.sproutventory[t].carryingbomb = 1
-                                    throbert.sproutventory[t].bomb = this
-                                    throbert.sproutventory[t].busy = 1
-                                    this.picked = 1
+                                        this.cling = 1
+                                        this.clingTo = throbert.sproutventory[t]
+                                        this.active = 2
+                                        throbert.sproutventory[t].carryingbomb = 1
+                                        throbert.sproutventory[t].bomb = this
+                                        throbert.sproutventory[t].busy = 1
+                                        this.picked = 1
+                                    }
                                 }
-                            }
                                 // this.suprabody.color = "orange"
                                 // this.suprabody.draw()
                             }
@@ -5618,7 +5912,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 }
 
 
-                canvas_context.drawImage(hotbomb, (this.step % 8) * (hotbomb.width / 8), 0, hotbomb.width / 8, hotbomb.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                if (this.cling != 1) {
+                    canvas_context.drawImage(hotbomb, (this.step % 8) * (hotbomb.width / 8), 0, hotbomb.width / 8, hotbomb.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+                }
 
             }
 
@@ -5760,6 +6056,46 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const tarpart = new Image()
     tarpart.src = "tarpart2.png"
     canvas_context.drawImage(tarpart, 0, 0)
+
+
+
+    const thermometerpart = new Image()
+    thermometerpart.src = "thermometerpart.png"
+    canvas_context.drawImage(thermometerpart, 0, 0)
+    const controlpanelpart = new Image()
+    controlpanelpart.src = "controlpanelpart.png"
+    canvas_context.drawImage(controlpanelpart, 0, 0)
+    const randomnumerpart = new Image()
+    randomnumerpart.src = "randomnumberpart.png"
+    canvas_context.drawImage(randomnumerpart, 0, 0)
+    const transporterpart = new Image()
+    transporterpart.src = "transporterpart.png"
+    canvas_context.drawImage(transporterpart, 0, 0)
+    const watercooler = new Image()
+    watercooler.src = "watercooler.png"
+    canvas_context.drawImage(watercooler, 0, 0)
+    const ambiguoussignalpart = new Image()
+    ambiguoussignalpart.src = "ambiguoussignalpart.png"
+    canvas_context.drawImage(ambiguoussignalpart, 0, 0)
+    const flingpart = new Image()
+    flingpart.src = "flingpart.png"
+    canvas_context.drawImage(flingpart, 0, 0)
+    const ripplepart = new Image()
+    ripplepart.src = "ripplepart.png"
+    canvas_context.drawImage(ripplepart, 0, 0)
+    const signaljellypart = new Image()
+    signaljellypart.src = "signaljellypart.png"
+    canvas_context.drawImage(signaljellypart, 0, 0)
+    const databasepart = new Image()
+    databasepart.src = "databasepart.png"
+    canvas_context.drawImage(databasepart, 0, 0)
+    const ringsheet = new Image()
+    ringsheet.src = "ringsheet.png"
+    canvas_context.drawImage(ringsheet, 0, 0)
+
+
+
+
     // console.log(clockwork.width)
     // while(clockwork.width <= 0){
     //     canvas_context.drawImage(clockwork,0,0)
@@ -5780,6 +6116,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.maxhealth = 100000
             this.body.health = this.health
             this.drawn = 0
+
+            this.weight = 50
 
             if (this.type == 0) {
                 this.weight = 400
@@ -5896,15 +6234,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.spliceout = 1
             }
             this.body.health = this.health
-            this.body.draw()
             this.step++
             if (this.type == 0) {
                 this.drawn++
+                this.body.draw()
                 canvas_context.drawImage(gearsheet, (this.step % 305) * (gearsheet.width / 305), 0, gearsheet.width / 305, gearsheet.height, this.body.x - this.body.radius, this.body.y - this.body.radius, this.body.radius * 2, this.body.radius * 2)
             }
 
             if (this.type == 1) {
                 this.drawn++
+                this.body.draw()
                 canvas_context.drawImage(spinbox, (this.step % 524) * (spinbox.width / 524), 0, spinbox.width / 524, spinbox.height, this.body.x - this.body.radius, this.body.y - this.body.radius, this.body.radius * 2, this.body.radius * 2)
             }
 
@@ -5915,16 +6254,19 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             if (this.type == 3) {
                 this.drawn++
+                this.body.draw()
                 canvas_context.drawImage(snakepart, (this.step % 1126) * (snakepart.width / 1126), 0, snakepart.width / 1126, snakepart.height, this.body.x - (this.body.radius * .9), this.body.y - (this.body.radius * .9), this.body.radius * 1.8, this.body.radius * 1.8)
             }
 
             if (this.type == 4) {
                 this.drawn++
+                this.body.draw()
                 canvas_context.drawImage(bubblepart, (this.step % 323) * (bubblepart.width / 323), 0, bubblepart.width / 323, bubblepart.height, this.body.x - (this.body.radius), this.body.y - (this.body.radius), this.body.radius * 2, this.body.radius * 2)
             }
 
             if (this.type == 5) {
                 this.drawn++
+                this.body.draw()
                 canvas_context.drawImage(harmlessdisarmerpart, (this.step % 71) * (harmlessdisarmerpart.width / 71), 0, harmlessdisarmerpart.width / 71, harmlessdisarmerpart.height, this.body.x - (this.body.radius * 2), this.body.y - (this.body.radius * 2), this.body.radius * 4, this.body.radius * 4)
             }
 
@@ -5966,6 +6308,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.type == 13) {
                 this.drawn++
                 // this.step+=4
+                this.body.draw()
                 canvas_context.drawImage(boidpart, (this.step % 684) * (boidpart.width / 684), 0, boidpart.width / 684, boidpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 14) {
@@ -5986,6 +6329,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.type == 17) {
                 this.drawn++
                 // this.step+=4
+                this.body.draw()
                 canvas_context.drawImage(drone985, (this.step % 985) * (drone985.width / 985), 0, drone985.width / 985, drone985.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 18) {
@@ -6031,6 +6375,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.type == 26) {
                 this.drawn++
                 // this.step+=4
+                this.body.draw()
                 canvas_context.drawImage(medbaypart, (this.step % 33) * (medbaypart.width / 33), 0, medbaypart.width / 33, medbaypart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
             if (this.type == 27) {
@@ -6047,6 +6392,73 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.drawn++
                 // this.step+=4
                 canvas_context.drawImage(tarpart, (this.step % 103) * (tarpart.width / 103), 0, tarpart.width / 103, tarpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 30) {
+                this.drawn++
+                // this.step+=4
+                this.body.draw()
+                canvas_context.drawImage(thermometerpart, (this.step % 426) * (thermometerpart.width / 426), 0, thermometerpart.width / 426, thermometerpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 31) {
+                this.drawn++
+                // this.step+=4
+                const modular = Math.round(controlpanelpart.width/controlpanelpart.height)
+                canvas_context.drawImage(controlpanelpart, (this.step % modular) * (controlpanelpart.width / modular), 0, controlpanelpart.width / modular, controlpanelpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 32) {
+                this.drawn++
+                const modular = Math.round(randomnumerpart.width/randomnumerpart.height)
+                canvas_context.drawImage(randomnumerpart, (this.step % modular) * (randomnumerpart.width / modular), 0, randomnumerpart.width / modular, randomnumerpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 33) {
+                this.drawn++
+                const modular = Math.round(transporterpart.width/transporterpart.height)
+                canvas_context.drawImage(transporterpart, (this.step % modular) * (transporterpart.width / modular), 0, transporterpart.width / modular, transporterpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 34) {
+                this.drawn++
+                this.body.color = "#aaFF88"
+                this.body.draw()
+                const modular = Math.round(watercooler.width/watercooler.height)
+                canvas_context.drawImage(watercooler, (this.step % modular) * (watercooler.width / modular), 0, watercooler.width / modular, watercooler.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 35) {
+                this.drawn++
+                this.body.color = "#DDDDDD"
+                this.body.draw()
+                const modular = Math.round(ambiguoussignalpart.width/ambiguoussignalpart.height)
+                canvas_context.drawImage(ambiguoussignalpart, (this.step % modular) * (ambiguoussignalpart.width / modular), 0, ambiguoussignalpart.width / modular, ambiguoussignalpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 36) {
+                this.drawn++
+                this.body.color = "#00FF0066"
+                this.body.draw()
+                const modular = Math.round(flingpart.width/flingpart.height)
+                canvas_context.drawImage(flingpart, (this.step % modular) * (flingpart.width / modular), 0, flingpart.width / modular, flingpart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 37) {
+                this.drawn++
+                const modular = Math.round(ripplepart.width/ripplepart.height)
+                canvas_context.drawImage(ripplepart, (this.step % modular) * (ripplepart.width / modular), 0, ripplepart.width / modular, ripplepart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 38) {
+                this.drawn++
+                const modular = Math.round(signaljellypart.width/signaljellypart.height)
+                canvas_context.drawImage(signaljellypart, (this.step % modular) * (signaljellypart.width / modular), 0, signaljellypart.width / modular, signaljellypart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 39) {
+                this.drawn++
+                this.body.color = "#ABCDEF"
+                this.body.draw()
+                const modular = Math.round(databasepart.width/databasepart.height)
+                canvas_context.drawImage(databasepart, (this.step % modular) * (databasepart.width / modular), 0, databasepart.width / modular, databasepart.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
+            }
+            if (this.type == 40) {
+                this.drawn++
+                // this.body.color = "#ABCDEF"
+                // this.body.draw()
+                const modular = Math.round(ringsheet.width/ringsheet.height)
+                canvas_context.drawImage(ringsheet, (this.step % modular) * (ringsheet.width / modular), 0, ringsheet.width / modular, ringsheet.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.0), this.body.radius * 2.0, this.body.radius * 2.0)
             }
 
             if (throbert.body.doesPerimeterTouch(this.body)) {
@@ -6072,8 +6484,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.mode = 0
             if (this.mode == 1) {
                 // this.map = pumpmap
-            } else {
+            } else if (this.mode == 0) {
                 this.map = fatmap
+            } else {
+                this.map = smallpit
             }
             // //console.log(this.map)
             this.road = {}
@@ -6092,7 +6506,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         this.road[`${t * ten},${k * ten}`] = rect
                     }
                 }
-            } else {
+            } else if (this.mode == 1) {
 
                 for (let t = 0; t < 1024; t++) {
                     for (let k = 0; k < 1024; k++) {
@@ -6102,6 +6516,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         const rect = new PointD((t * ten) + 5, (k * ten) + 5)
                         rect.z = 1 - ((this.map[`${t * ten},${k * ten}`].z))
                         // //console.log(rect.z)
+                        this.road[`${t * ten},${k * ten}`] = rect
+                    }
+                }
+            } else {
+
+                for (let t = 0; t < 1024; t++) {
+                    for (let k = 0; k < 1024; k++) {
+                        const rect = new PointD((t * ten) + 5, (k * ten) + 5)
+                        rect.z = (1 - ((this.map[(k * 1024) + t]))) * 1.2
                         this.road[`${t * ten},${k * ten}`] = rect
                     }
                 }
@@ -6141,8 +6564,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.worldmap = new Image()
             if (this.mode == 0) {
                 this.worldmap.src = "mediumwebmap.png" //fatmap
-            } else {
+            } else if (this.mode == 1) {
                 this.worldmap.src = "pikmap4202.png"
+            } else {
+                this.worldmap.src = "pikmap4206.png"
             }
             this.captain = new Image()
             this.captain.src = "imago4bl.png"
@@ -6206,8 +6631,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
             nodespecial8.equity = new CircleS(7148, 9257, 660, "Red")
             nodespecial8.big = new CircleS(7148, 9257, 200, "Red")
 
+            let nodespecial9 = new CircleS(6346, 7545, 600, "Red")
+            nodespecial9.priority = 99.1
+            nodespecial9.small = new CircleS(6346, 7545, 20, "Red")
+            nodespecial9.equity = new CircleS(6346, 7545, 660, "Red")
+            nodespecial9.big = new CircleS(6346, 7545, 200, "Red")
 
-            this.nodes = [nodespecial, nodespecial2, nodespecial3, nodespecial4, nodespecial5, nodespecial6, nodespecial7, nodespecial8]
+
+            this.nodes = [nodespecial, nodespecial2, nodespecial3, nodespecial4, nodespecial5, nodespecial6, nodespecial7, nodespecial8, nodespecial9]
             for (let t = 0; t < this.nodemap.length; t++) {
                 let node = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 600, "Red")
                 node.priority = this.nodemap[t].z //- (t/100000)
@@ -6683,13 +7114,80 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 target.body.radius = 40
                 this.enemies.push(target)
 
+
+                const thermometer = new Part(8300, 8136, 30)
+                thermometer.body.color = "#FFAA4488"
+                thermometer.body.radius = 30
+                this.enemies.push(thermometer)
+
+
+                const pannel = new Part(7500, 7866, 31)
+                pannel.body.color = "#FFAA4488"
+                pannel.body.radius = 30
+                this.enemies.push(pannel)
+
+                const rngmachine = new Part(5772, 5943, 32)
+                rngmachine.body.color = "#FFAA4488"
+                rngmachine.body.radius = 30
+                this.enemies.push(rngmachine)
+
+                const porterr = new Part(6500, 7557, 33)
+                porterr.body.radius = 30
+                this.enemies.push(porterr)
+
+                const rainmachine = new Part(7519, 5684, 34)
+                rainmachine.body.radius = 30
+                this.enemies.push(rainmachine)
+
+                const turnsignal = new Part(5682, 6536, 35)
+                turnsignal.body.radius = 30
+                this.enemies.push(turnsignal)
+
+                const flingersponge = new Part(8074, 4453, 36)
+                flingersponge.body.radius = 30
+                this.enemies.push(flingersponge)
+
+                const mobiusring = new Part(8574, 3753, 37)
+                mobiusring.body.radius = 22
+                this.enemies.push(mobiusring)
+
+                const signaljelly = new Part(7798, 2416, 38)
+                signaljelly.body.radius = 22
+                this.enemies.push(signaljelly)
+
+                const redthign = new Part(8300, 2689, 39)
+                redthign.body.radius = 22
+                this.enemies.push(redthign)
+
+                const ringuses = new Part(400, 6000, 40)
+                ringuses.body.radius = 25
+                this.enemies.push(ringuses)
+
+
+
+
+                // for(let t = 0;t<9;t++){
+                //     const target = new Part(0, 0, 31+t)
+                //     target.body.color = "#000000"
+                //     target.body.radius = 30
+                //     this.enemies.push(target)
+    
+                // }
+
+
+
+
+
+
+
+
                 // let mod = 5
-                // let x = 4900
-                // let y = 4400
+                // let x = 4700
+                // let y = 4700
                 // for(let t = 0;t<this.enemies.length;t++){
 
-                //     if(t%5 == 0 && t>0){
-                //         x = 4900
+                //     if(t%8 == 0 && t>0){
+                //         x = 4700
                 //         y+=110
                 //     }
                 //     this.enemies[t].body.x = x
@@ -6735,6 +7233,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.enemies.push(plug)
                 }
 
+                // for (let t = 0; t < 200; t++) {
+                //     const plug = new Wallatoid(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
+                //     plug.body.x *= 2
+                //     plug.body.y *= 2
+                //     this.enemies.push(plug)
+                // }
                 for (let t = 0; t < 200; t++) {
                     const plug = new Ploorenab(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
                     plug.body.x *= 2
@@ -6802,7 +7306,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 for (let k = 0; k < this.enemies.length; k++) {
                     this.enemies[k].body.supralinks = []
                     for (let t = 0; t < this.nodes.length; t++) {
-                        this.enemies[k].body.supralinks.push(new LineOPD(this.enemies[k].body, this.nodes[t]))
+                        if (this.enemies[k].body.rect == 1) {
+                            this.enemies[k].body.supralinks.push(new LineOPD(this.enemies[k].center, this.nodes[t]))
+                        } else {
+                            this.enemies[k].body.supralinks.push(new LineOPD(this.enemies[k].body, this.nodes[t]))
+                        }
                     }
                 }
 
@@ -6845,7 +7353,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
             // canvas_context.drawImage(this.worldmap, 0, 0) ///, 1024, 1024, 0, 0, 10240, 10240)
             // canvas_context.drawImage(this.worldmap, Math.min(Math.max((this.body.x-640)*.25,0),10240*.25), Math.min(Math.max((this.body.y-360)*.25,0),10240*.25), 320,180, Math.min(Math.max(this.body.x-640,0),10240), Math.min(Math.max(this.body.y-360,0),10240), 1280, 720)///, 1024, 1024, 0, 0, 10240, 10240)
             // canvas_context.imageSmoothingEnabled = true
+            // if(this.mode == 0){
             canvas_context.drawImage(this.worldmap, 0, 0, this.worldmap.width, this.worldmap.height, 0, 0, 10240, 10240) ///, 1024, 1024, 0, 0, 10240, 10240)
+            // }else{
+            // canvas_context.drawImage(this.worldmap, 0, 0, this.worldmap.width, this.worldmap.height, 0, 0, 10240, 10240) ///, 1024, 1024, 0, 0, 10240, 10240)
+            // }
 
             // let data = canvas_context.getImageData(-640, -940, 2560, 2560)
             // this.c1.draw()
@@ -7107,8 +7619,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.enemies[t].body.ymom = 0
                     this.enemies[t].body.sxmom = 0
                     this.enemies[t].body.symom = 0
-                    this.enemies[t].body.x = this.c1.x
-                    this.enemies[t].body.y = this.c1.y
+                    if (this.enemies[t].body.rect == 1) {
+                        this.enemies[t].body.x = this.c1.x - (this.enemies[t].body.width * .5)
+                        this.enemies[t].body.y = this.c1.y - (this.enemies[t].body.height * .5)
+                    } else {
+                        this.enemies[t].body.x = this.c1.x
+                        this.enemies[t].body.y = this.c1.y
+                    }
                 }
                 this.enemies[t].body.k = t
                 if (this.enemies[t].health <= 0) {
@@ -7260,8 +7777,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.enemies[t].body.ymom = 0
                     this.enemies[t].body.sxmom = 0
                     this.enemies[t].body.symom = 0
-                    this.enemies[t].body.x = this.c1.x
-                    this.enemies[t].body.y = this.c1.y
+                    if (this.enemies[t].body.rect == 1) {
+                        this.enemies[t].body.x = this.c1.x - (this.enemies[t].body.width * .5)
+                        this.enemies[t].body.y = this.c1.y - (this.enemies[t].body.height * .5)
+                    } else {
+                        this.enemies[t].body.x = this.c1.x
+                        this.enemies[t].body.y = this.c1.y
+                    }
                 }
             }
 
@@ -7647,6 +8169,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
                         canvas_context.strokeText(`${omegahash[keys[t]].carriers}`, this.enemies[keys[t]].body.x - (canvas_context.measureText(`${omegahash[keys[t]].carriers}`).width * .5), this.enemies[keys[t]].body.y - (h * 2.4))
                         canvas_context.fillText(`${omegahash[keys[t]].carriers}`, this.enemies[keys[t]].body.x - (canvas_context.measureText(`${omegahash[keys[t]].carriers}`).width * .5), this.enemies[keys[t]].body.y - (h * 2.4))  //-(this.enemies[keys[t]].body.radius*.5)
+                        this.enemies[keys[t]].healthbar = new Rectangle(0, 0, 0, 0, "transparent")
                         this.enemies[keys[t]].healthbar.color = "#FFFFFF"
                         this.enemies[keys[t]].healthbar.y = (this.enemies[keys[t]].body.y - (h * 2.2))
                         this.enemies[keys[t]].healthbar.x = (this.enemies[keys[t]].body.x - this.enemies[keys[t]].body.radius)
@@ -7683,8 +8206,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 
             for (let t = 0; t < this.enemies.length; t++) {
-                if(this.enemies[t].out != 1){
-                    if(typeof this.enemies[t].healthDraw == "function"){
+                if (this.enemies[t].out != 1) {
+                    if (typeof this.enemies[t].healthDraw == "function") {
                         this.enemies[t].healthDraw()
                     }
                 }
@@ -7718,7 +8241,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             canvas_context.translate(xdiff, ydiff)
             if (gamepadAPI.buttonsStatus.includes('Y') || keysPressed['m']) {
-                megamap_context.drawImage(this.worldmap, 0, 0, 5120, 5120, 0, 0, 10240, 10240) ///, 1024, 1024, 0, 0, 10240, 10240)
+                if (this.mode == 0) {
+                    megamap_context.drawImage(this.worldmap, 0, 0, 5120, 5120, 0, 0, 10240, 10240) ///, 1024, 1024, 0, 0, 10240, 10240)
+                } else {
+                    megamap_context.drawImage(this.worldmap, 0, 0, 1024, 1024, 0, 0, 10240, 10240) ///, 1024, 1024, 0, 0, 10240, 10240)
+                }
                 // megamap_context.drawImage(canvas, 0,0, 1280,720, (this.body.x + 200) + (Math.max(throbert.body.x-640, 0)/32), (this.body.y-200) + (Math.max(throbert.body.y-360, 0)/32), (1280/32),(720/32))
                 megamap_context.drawImage(canvas, 0, 0, 1280, 720, (Math.max(throbert.body.x - 640, 0)), (Math.max(throbert.body.y - 360, 0)), (1280), (720))
                 megamap_context.drawImage(this.captain, 0, 0, this.captain.width, this.captain.height, Math.round(this.body.x - (this.body.radius * 20)), Math.round(this.body.y - (this.body.radius * 20)), 40 * this.body.radius, 40 * this.body.radius)
@@ -7805,6 +8332,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
         frames++
 
         throbert.draw()
+
+
+        // for(let t = 0;t<throbert.enemies.length;t++){
+        //     throbert.enemies[t].draw()
+        // }
         // if (keysPressed['-'] && recording == 0) {
         //     recording = 1
         //     video_recorder.record()
