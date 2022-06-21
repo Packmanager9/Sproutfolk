@@ -9,11 +9,26 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const globalspeedlimit = 6
     let charge = new Audio()
     charge.src = "charge.mp3"
+    let ambiance = new Audio()
+    ambiance.src = "ambiance.mp3"
+    let flingsound = new Audio()
+    flingsound.src = "fling.mp3"
+    let fwee = new Audio()
+    fwee.src = "fwee.mp3"
+    let peh = new Audio()
+    peh.src = "peh2.mp3"
+    let geooff = new Audio()
+    geooff.src = "geooff.mp3"
+    let bubpeh = new Audio()
+    bubpeh.src = "bubpeh2.mp3"
+    let boom = new Audio()
+    boom.src = "boom.mp3"
     let whistle = new Audio()
     whistle.src = "whistle.mp3"
-    whistle.volume = .3
+    whistle.volume = .15
     let beamboss = new Audio()
     let absorb = new Audio()
+    absorb.volume = .4
     absorb.src = "absorb.mp3"
 
     const worksounds = []
@@ -2745,6 +2760,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         if (this.clingTo.timer > 20) {
                             this.clingTo.timer = 20
                             if (throbert.playlink.hypotenuse() < 900) {
+                                absorb.volume =  Math.max(.3 - (throbert.playlink.hypotenuse() * .0005)  , 0)
                                 absorb.play()
                             }
                         }
@@ -3161,6 +3177,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         if ((this.cycle % 100).between(80, 100)) {
                             this.body.radius = 40 + (Math.abs(5 - (this.cycle % 10)) * 2)
                             this.pulse = 1
+                            geooff.volume =Math.max(.6 - (this.playlink.hypotenuse() * .0005)  , 0)
+                            geooff.play()
                         } else {
                             this.pulse = 0
                             this.body.radius = 40
@@ -3487,6 +3505,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     if ((this.cycle % 25).between(20, 25)) {
                         this.body.radius = 30 + (Math.abs(5 - (this.cycle % 10)) * 2)
                         this.pulse = 1
+                        geooff.volume =Math.max(.6 - (this.playlink.hypotenuse() * .0005)  , 0)
+                        geooff.play()
                     } else {
                         this.pulse = 0
                         this.body.radius = 30
@@ -4329,6 +4349,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             if (this.health > 0) {
                 if ((this.spoutcount % 100).between(80, 100) && this.spoutcount % 6 == 0) {
+                    peh.volume = Math.max(.3 - (this.playlink.hypotenuse() * .0005)  , 0)
+                    peh.play()
                     let shot = new Circle((this.claws[0].x + this.claws[0].x) * .5, (this.claws[0].y + this.claws[0].y) * .5, 7, this.colors[0], Math.cos(this.angle) * 4, Math.sin(this.angle) * 4)
                     shot.link = new LineOPD(this.body, shot)
                     this.shots.push(shot)
@@ -4345,6 +4367,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     if ((this.cycle % 60).between(50, 59)) {
                         this.body.radius = 16 + (Math.abs(5 - (this.cycle % 10)) * 2)
                         this.pulse = 1
+                        geooff.volume =Math.max(.3 - (this.playlink.hypotenuse() * .0005)  , 0)
+                        geooff.play()
                     } else {
                         this.pulse = 0
                         this.body.radius = 16
@@ -4716,6 +4740,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     shot.release = 100
                     shot.shot = 1
                     shot.pile = []
+                    
+                    bubpeh.volume = Math.max(.3 - (this.playlink.hypotenuse() * .0005)  , 0)
+                    bubpeh.play()
                     this.shots.push(shot)
                 }
             }
@@ -4730,6 +4757,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     if ((this.cycle % 60).between(50, 59)) {
                         this.body.radius = 16 + (Math.abs(5 - (this.cycle % ten)) * 2)
                         this.pulse = 1
+                        geooff.volume =Math.max(.3 - (this.playlink.hypotenuse() * .0005)  , 0)
+                        geooff.play()
                     } else {
                         this.pulse = 0
                         this.body.radius = 16
@@ -5055,6 +5084,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     if ((this.cycle % 110).between(100, 105)) {
                         this.body.radius = 60 + (Math.abs(3 - (this.cycle % 6)) * .5)
                         this.pulse = 1
+                        geooff.volume =Math.max(.6 - (this.playlink.hypotenuse() * .0005)  , 0)
+                        geooff.play()
                     } else {
                         this.pulse = 0
                         this.body.radius = 60
@@ -5322,6 +5353,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     if ((this.cycle % 60).between(50, 59)) {
                         this.body.radius = 12 + Math.abs(5 - (this.cycle % ten))
                         this.pulse = 1
+                        geooff.volume =Math.max(.3 - (this.playlink.hypotenuse() * .0005)  , 0)
+                        geooff.play()
                     } else {
                         this.pulse = 0
                         this.body.radius = 12
@@ -5858,6 +5891,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             if (this.active == 1) {
                 if (this.step == 7) {
                     if (this.body.radius < 51) {
+                        boom.volume =Math.max(.3 - (this.playlink.hypotenuse() * .0005)  , 0)
+                        boom.play()
                         this.body.radius += 8
                     } else {
                         this.spliceout = 1
@@ -6472,6 +6507,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     class Throbert {
         constructor() {
             this.pause = new PauseMenu()
+            this.flingframes = 0
             this.haspicked = 0
             this.smack = 0
             this.lmom = 50
@@ -7471,9 +7507,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.seeky = ((this.seeky * 9) + ((gamepadAPI.axesStatus[3]) * 95)) * .1
                 }
             }
-            this.volumeplay = sum / 3
+            this.volumeplay = (sum / 3)*.3 //.5
 
-            charge.volume = Math.min(this.volumeplay, .9)
+            charge.volume = Math.min(this.volumeplay, .45)
             if (!gamepadAPI.buttonsStatus.includes('Left-Trigger')) {
                 charge.play()
             }
@@ -7893,7 +7929,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     }
                 }
 
-
+                this.flingframes--
                 if (this.sproutventory[t].grab == 1) {
                     this.sproutventory[t].attent = 1
                     this.sproutventory[t].body.x = this.body.x
@@ -7902,13 +7938,22 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     if (keysPressed[' '] || gamepadAPI.buttonsStatus.includes('Left-Trigger')) {
                         if (keysPressed[' '] || Math.abs(gamepadAPI.axesStatus[2]) > 0.09 || Math.abs(gamepadAPI.axesStatus[3]) > 0.09) {
                             this.grab = -3
-
+                            if(this.flingframes < 10){
+                                flingsound.volume = .5
+                                flingsound.currentTime = Math.random() //*1.7
+                                flingsound.play()
+                                this.flingframes = 50
+                            }
                             // let link = new LineOP(throbert.body, throbert.seek)
                             if (this.sproutventory[t].type == 2) {
                                 this.sproutventory[t].body.xmom = (Math.cos(this.angf) * 41.2)// (gamepadAPI.axesStatus[2] * 1) * 31.3
                                 this.sproutventory[t].body.ymom = (Math.sin(this.angf) * 41.2)//(gamepadAPI.axesStatus[3] * 1) * 31.3
                                 this.sproutventory[t].grab = 0
                                 this.sproutventory[t].fly = 20
+                                if(this.sproutventory[t].carryingbomb == 1){
+                                    fwee.volume = .4
+                                    fwee.play()
+                                }
                             } else {
 
                                 this.sproutventory[t].body.xmom = (Math.cos(this.angf) * 31.2)// (gamepadAPI.axesStatus[2] * 1) * 31.3
@@ -7918,6 +7963,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             }
                         }
                     }
+                }
+                if(this.flingframes < 0){
+                    flingsound.pause()
                 }
                 if (this.sproutventory[t].grounded != 1 && this.sproutventory[t].fly <= 0 && this.sproutventory[t].hittime % 3 == 0) {
                     for (let k = Math.max(t - 1, 0); k < this.sproutventory.length; k++) {  //not t? 0?
@@ -8308,7 +8356,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
     let now = Date.now()
     let frames = 0
     let oldframes = 0
+    ambiance.volume = .01
     function main() {
+        ambiance.volume = .03
+        ambiance.play()
 
         canvas_context.clearRect(-1000000, -1000000, canvas.width * 10000000, canvas.height * 10000000)
         gamepadAPI.update()
