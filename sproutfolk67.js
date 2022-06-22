@@ -6521,6 +6521,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         constructor(x, y, type) {
             this.healthbar = new Rectangle(0, 0, 0, 0, "red")
             // this.healthbar.draw = empty
+            this.collect = 1
             this.body = new Circle(x, y, 30, "red")
             this.step = 0
             this.type = type
@@ -6884,6 +6885,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     class Throbert {
         constructor() {
+            this.parts = 0
+            this.partscap = 41
             this.qsmack = 0
             this.pause = new PauseMenu()
             this.flingframes = 0
@@ -8021,6 +8024,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         this.sproutventory[k].elinks.splice(t, 1)
                     }
                     let govsl = this.enemies[t].value
+                    if(this.enemies[t].collect == 1){
+                        throbert.parts++
+                    }
                     this.enemies.splice(t, 1)
                     if (govsl > 0) {
                         this.spawn(govsl)
@@ -8705,9 +8711,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
             canvas_context.fillStyle = "orange"
             canvas_context.fillText(Math.floor(this.body.x) + "," + Math.floor(this.body.y), this.body.x - 620, this.body.y - 240)
             canvas_context.fillStyle = "red"
-            canvas_context.fillText(this.sproutventory.length, this.body.x - 620, this.body.y - 210)
+            canvas_context.fillText("Guys: " +this.sproutventory.length, this.body.x - 620, this.body.y - 210)
             canvas_context.fillStyle = "#FF00AA"
             canvas_context.fillText('FPS: ' + oldframes, this.body.x - 620, this.body.y - 180)
+            canvas_context.fillStyle = "#AAFF00"
+            if(this.parts<this.partscap){
+                canvas_context.fillText('Parts: ' + this.parts+'/'+this.partscap, this.body.x - 620, this.body.y - 150)
+            }else{  
+                canvas_context.fillText('Parts: ' + "Complete!", this.body.x - 620, this.body.y - 150)
+            }
             // canvas_context.fillStyle = "white"
             // canvas_context.fillText('Priority: ' +globalPrio, this.body.x - 620, this.body.y - 150)
             // ////console.log(this)
