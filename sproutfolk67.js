@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     let ambiance = new Audio()
     ambiance.src = "ambiance.mp3"
     let flingsound = new Audio()
-    flingsound.src = "fling.mp3"
+    flingsound.src = "fling4.mp3"
     let fwee = new Audio()
     fwee.src = "fwee.mp3"
     let peh = new Audio()
@@ -1762,9 +1762,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
             TIP_engine.y = YS_engine - txfr.f
             TIP_engine.body = TIP_engine
             throbert.whistling = 0
+            throbert.guiding = 1
             // example usage: if(object.isPointInside(TIP_engine)){ take action }
-            window.addEventListener('pointermove', continued_stimuli);
         });
+
+        window.addEventListener('pointermove', continued_stimuli);
         window.addEventListener('contextmenu', e => {
             e.preventDefault()
             throbert.whistling = 1
@@ -1776,13 +1778,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
             TIP_engine.y = YS_engine - txfr.f
             TIP_engine.body = TIP_engine
             // example usage: if(object.isPointInside(TIP_engine)){ take action }
-            window.addEventListener('pointermove', continued_stimuli);
+            // window.addEventListener('pointermove', continued_stimuli);
         });
         window.addEventListener('pointerup', e => {
             throbert.guiding = 0
             throbert.whistling = 0
 
-            window.removeEventListener("pointermove", continued_stimuli);
+            // window.removeEventListener("pointermove", continued_stimuli);
         })
         function continued_stimuli(e) {
             FLEX_engine = canvas.getBoundingClientRect();
@@ -1796,7 +1798,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
             let link2 = (new LineOPD(TIP_engine, throbert.body)).hypotenuse()
             throbert.seekz = (Math.cos(link) * (Math.min(95, link2)))
             throbert.seekw = (Math.sin(link) * (Math.min(95, link2)))
-            throbert.guiding = 1
+            // throbert.guiding = 1
+            if(throbert.qsmack == 1){
+                throbert.seekx = ((throbert.seekx * 3) + (throbert.seekz)) * .25
+                throbert.seeky = ((throbert.seeky * 3) + (throbert.seekw)) * .25
+            }
         }
     }
     function gamepad_control(object, speed = 1) { // basic control for objects using the controler
@@ -4453,6 +4459,378 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 
+
+    class Planata {
+        constructor(x, y, colors, pen) {
+            this.type =  - Math.floor(Math.random() * 3)
+            this.body = new Circle(x, y, 12, "red")
+
+            if (this.type == 0) {
+                this.shotsprite = shotspritec
+            } else if (this.type == 1) {
+                this.shotsprite = shotspritem
+            } else if (this.type == 2) {
+                this.shotsprite = shotspritey
+            }
+            if (this.type == 0) {
+                this.doodle = doodlec
+            } else if (this.type == 1) {
+                this.doodle = doodlem
+            } else if (this.type == 2) {
+                this.doodle = doodley
+            }
+
+
+            this.bodyarea = new Circle(x, y, 120, "red")
+            this.go = this.body
+            this.health = 6000
+            this.maxhealth = this.health
+            this.value = 15
+            this.body.timer = 999999999999 * 999999999999
+            this.body.health = this.health
+            this.weight = 14
+            this.body.weight = 1 / this.weight
+            this.cost = 400
+            this.variety = 2.5
+            this.needs = []
+            this.colors = colors
+            for (let t = 0; t < this.colors.length; t++) {
+                this.colors[t] = this.body.color
+            }
+            this.radius = 9
+            // this.body = new TileCircle(x, y, 5, this.colors[0])
+            this.body.angle = 0
+            this.clip = 0
+            this.slip = .05
+            this.spin = 0
+            this.crab = 1
+            this.scale = .5
+            this.age = 0
+            this.pen = pen
+            this.body.friction = .9
+            this.cycle = 0
+            this.pulse = 0
+            this.playlink = new LineOPD(this.body, throbert.body)
+            this.spoutcount = 0
+            this.shots = []
+            this.firstdead = 0
+        }
+
+        jumpspin() {
+            if (Math.random() < .2) {
+                this.spin = -Math.random() * .2
+            }
+            if (Math.random() < .2) {
+                this.spin = Math.random() * .2
+            }
+            this.body.angle += Math.random() - .5
+        }
+        speedlimit() {
+            let brf = 0
+            while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit) {
+                brf++
+                if (brf > 8) {
+                    break
+                }
+                this.body.xmom *= .8
+                this.body.ymom *= .8
+                this.body.sxmom *= .8
+                this.body.symom *= .8
+            }
+        }
+
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x - 8, this.body.y + (this.body.radius * 1.2), 16, 16, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
+            }
+        }
+
+
+
+        draw() {
+            if (this.playlink.hypotenuse() > 1200) {
+                return
+            }
+
+            if (this.health <= 0) {
+                this.body.smove()
+                if (this.firstdead == 0) {
+                    this.firstdead = 1
+                    for (let t = 0; t < enemysounds.length; t++) {
+                        if (enemysounds[t].paused) {
+                            enemysounds[t].play()
+                            break
+                        }
+                    }
+                }
+            } else {
+
+                for (let x = 0; x < 20; x++) {
+                    this.body.frictiveMove10()
+                    this.xcord = Math.floor((this.body.x) * .1) * ten
+                    this.xcord = Math.max(this.xcord, 0)
+                    this.xcord = Math.min(this.xcord, 10230)
+                    this.ycord = Math.floor((this.body.y) * .1) * ten
+                    this.ycord = Math.max(this.ycord, 0)
+                    this.ycord = Math.min(this.ycord, 10230)
+                    // ////console.log(this.xcord, this.ycord)
+                    if (throbert.road[`${this.xcord},${this.ycord}`].doesPerimeterTouch(this.body)) {
+                        for (let t = Math.max(this.xcord - ten, 0); t < Math.min(this.xcord + 20, 10230); t += ten) {
+                            for (let k = Math.max(this.ycord - ten, 0); k < Math.min(this.ycord + 20, 10230); k += ten) {
+
+                                // if (true) {
+                                const link = new LineOPD(this.body, throbert.road[`${t},${k}`])
+
+                                const hyp = link.hypotenuse()
+                                const angle = link.angle()
+                                if (Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z) <= .09) {
+                                } else {
+                                    if (hyp <= ten + this.body.radius) {
+                                        if (hyp <= ten + this.body.radius) {
+                                            if (Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z) <= .159) {
+
+                                            } else {
+                                                this.body.xmom = Math.cos(angle) * 2
+                                                this.body.ymom = Math.sin(angle) * 2
+                                                this.go = new Point(this.body.x + ((Math.random() - .5) * 300), this.body.y + ((Math.random() - .5) * 300))
+                                            }
+                                        } else if (hyp <= ten) {
+                                            if (Math.abs(throbert.road[`${t},${k}`].z - throbert.road[`${this.xcord},${this.ycord}`].z) <= .159) {
+
+                                            } else {
+                                                this.body.xmom = Math.cos(angle) * 2
+                                                this.body.ymom = Math.sin(angle) * 2
+                                                this.go = new Point(this.body.x + ((Math.random() - .5) * 300), this.body.y + ((Math.random() - .5) * 300))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            // }
+                        }
+                    }
+                }
+            }
+            if (this.health > 0) {
+                if (this.body.doesPerimeterTouch(this.go)) {
+                    this.go = new Point(this.body.x + ((Math.random() - .5) * 300), this.body.y + ((Math.random() - .5) * 300))
+                    let j = 0
+                    while (!this.go.doesPerimeterTouch(this.bodyarea)) {
+                        j++
+                        if (j > ten) {
+                            break
+                        }
+                        this.go = new Point(this.body.x + ((Math.random() - .5) * 300), this.body.y + ((Math.random() - .5) * 300))
+                    }
+                } else {
+                    this.body.xmom -= Math.sign(this.body.x - this.go.x) * .09
+                    this.body.ymom -= Math.sign(this.body.y - this.go.y) * .09
+                }
+            }
+            // this.needs = []
+            // let puddles = 0
+            // for (let t = 0; t < this.pen.enrichment.length; t++) {
+            //     if (this.pen.enrichment[t].puddle == 1) {
+            //         puddles++
+            //     }
+            // }
+            // if (((this.pen.body.width * this.pen.body.height)) / 8000 > (puddles)) {
+            //     this.needs.push('More Puddles')
+            // }
+            // if (((this.pen.body.width * this.pen.body.height) / this.pen.animals.length) < 4000 && this.pen.animals.length > 1) {
+            //     this.needs.push('Overcrowded')
+            // }
+            // if (this.pen.animals.length < 2) {
+            //     this.needs.push('Lonely')
+            // }
+            // this.age++
+            // this.scale = .5 + Math.min(this.age * .001, .5)
+            this.body.radius = 16
+            // this.body.draw()
+
+            // //console.log(this.body, this.doodle)
+            // if (this.health > 0) {
+            //     this.clip += this.slip
+            //     if (Math.abs(this.clip) > ((Math.PI * .25) + (this.clip * .25))) {
+            //         this.slip *= -1
+            //     }
+            // }
+            if (this.health > 0) {
+                if (Math.random() < .19) {
+                    if (Math.random() < .2) {
+                        this.spin = -Math.random() * .4
+                    }
+                    if (Math.random() < .2) {
+                        this.spin = Math.random() * .4
+                    }
+                    if (Math.random() < .8) {
+                        this.spin = 0
+                    }
+                }
+                this.body.angle += this.spin
+            }
+            // this.body.x += Math.cos(this.body.angle)
+            // this.body.y += Math.sin(this.body.angle)
+            this.claws = []
+            if (this.health > 0) {
+                this.angle = this.body.angle
+            }
+            for (let t = 0; t < 1; t++) {
+                const point = new Point(this.body.x + ((this.body.radius * 1.5) * Math.cos(this.angle)), (this.body.y + ((this.body.radius * 1.5) * Math.sin(this.angle))))
+                // this.angle += Math.PI / 1.5
+                this.claws.push(point)
+            }
+            for (let t = 0; t < this.claws.length; t++) {
+                const link = new LineOP(this.claws[t], this.body, this.colors[1], 5)
+                link.draw()
+            }
+            this.spoutcount++
+
+            for (let t = 0; t < this.shots.length; t++) {
+                if (this.shots[t].marked == 1) {
+                    this.shots.splice(t, 1)
+                }
+            }
+            for (let t = 0; t < this.shots.length; t++) {
+                this.shots[t].move()
+                // this.shots[t].draw()
+                canvas_context.drawImage(this.shotsprite, this.shots[t].x - 7, this.shots[t].y - 7)
+
+
+
+                if (this.shots[t].doesPerimeterTouch(throbert.body)) {
+                    this.shots[t].marked = 1
+                    throbert.health -= 5
+                    if (throbert.health <= 0) {
+                        this.shots[t].marked = 1
+                        throbert.health = 0
+                    }
+                }
+                if (this.shots[t].link.hypotenuse() > 300) {
+                    this.shots[t].marked = 1
+                }
+            }
+            // for (let t = 0; t < this.claws.length; t++) {
+            // let point = new Point((this.claws[0].x + this.claws[0].x)*.5,(this.claws[0].y + this.claws[0].y)*.5)
+            // let link = new LineOP(point, this.body, this.colors[1], 2)
+            // let hyp =  0//link.angle()
+            // // let point2 = new Circle((this.claws[0].x + this.claws[0].x) * .5 + ((this.body.radius * 1.9191) * Math.cos(this.clip + hyp)), ((this.claws[0].y + this.claws[0].y) * .5 + ((this.body.radius * 1.9191) * Math.sin(this.clip + hyp))), 4, this.colors[0])
+            // // let link3 = new LineOP(this.claws[0], point2, this.colors[2], 3)
+            // // let link2 = new LineOP(this.claws[0], point3, this.colors[3], 3)
+            // // link3.draw()
+            // // link2.draw()
+            // // point2.draw()
+            // // point3.draw()
+
+
+            if (this.health > 0) {
+                if ((this.spoutcount % 100).between(80, 100) && this.spoutcount % 6 == 0) {
+                    peh.volume = Math.max(.3 - (this.playlink.hypotenuse() * .0005)  , 0)
+                    peh.play()
+                    let shot = new Circle((this.claws[0].x + this.claws[0].x) * .5, (this.claws[0].y + this.claws[0].y) * .5, 7, this.colors[0], Math.cos(this.angle) * 4, Math.sin(this.angle) * 4)
+                    shot.link = new LineOPD(this.body, shot)
+                    this.shots.push(shot)
+                }
+            }
+
+
+
+
+
+            if (this.health > 0) {
+                if (this.health < this.maxhealth) {
+                    this.cycle++
+                    if ((this.cycle % 60).between(50, 59)) {
+                        this.body.radius = 16 + (Math.abs(5 - (this.cycle % 10)) * 2)
+                        this.pulse = 1
+                        geooff.volume =Math.max(.3 - (this.playlink.hypotenuse() * .0005)  , 0)
+                        geooff.play()
+                    } else {
+                        this.pulse = 0
+                        this.body.radius = 16
+                    }
+                }
+                for (let k = 0; k < throbert.sproutventory.length; k++) {
+                    if (this.type == throbert.sproutventory[k].type) {
+                        continue
+                    }
+                    if (this.elinks[k].hypotenuse() > 400) {
+                        continue
+                    }
+                    if (throbert.sproutventory[k].fly <= 0 && throbert.sproutventory[k].grounded != 1) {
+                    } else {
+                        continue
+                    }
+                    for (let t = 0; t < this.shots.length; t++) {
+                        if (throbert.sproutventory[k].cling != 1) {
+                            if (throbert.sproutventory[k].body.doesPerimeterTouch(this.shots[t])) {
+                                this.shots[t].marked = 1
+                                if (throbert.sproutventory[k].bloomdriptimer <= 0) {
+                                    if (throbert.sproutventory[k].bloom <= 0) {
+                                        throbert.sproutventory[k].marked = 20
+                                        throbert.sproutventory[k].body.xmom = 0
+                                        throbert.sproutventory[k].body.ymom = 0
+                                        throbert.sproutventory[k].body.friction = 0
+                                    } else {
+                                        throbert.sproutventory[k].bloomdriptimer = 20
+                                        throbert.sproutventory[k].bloom -= 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                this.pulse = 0
+                // this.body.radius = 12
+            }
+            // }
+            // ////////console.log(this)
+
+            // if (this.health > 0) {
+            //     if (this.body.doesPerimeterTouch(this.go)) {
+            //         this.go = new Circle(this.body.x + ((Math.random() - .5) * 100), this.body.y + ((Math.random() - .5) * 100), 10, "red")
+            //         while (!this.go.doesPerimeterTouch(this.bodyarea)) {
+            //             this.go = new Circle(this.body.x + ((Math.random() - .5) * 100), this.body.y + ((Math.random() - .5) * 100), 10, "red")
+            //         }
+            //     } else {
+            //         this.body.x -= Math.sign(this.body.x - this.go.x)
+            //         this.body.y -= Math.sign(this.body.y - this.go.y)
+            //         if (this.bodyarea.doesPerimeterTouch(throbert.body)) {
+
+            //             this.body.angle = ((this.body.angle * 5) + ((new LineOP(this.body, throbert.body)).angle()) + Math.PI) / 6
+            //         } else {
+            //             this.body.angle = ((this.body.angle * 18) + ((new LineOP(this.body, this.go)).angle()) + Math.PI) / 19
+            //         }
+            //     }
+            // }
+            this.body.timer--
+            if (this.body.timer <= 0) {
+                this.spliceout = 1
+            }
+            // this.healthbar = new Rectangle(this.body.x - 16, this.body.y + 18, (32) * (this.health / this.maxhealth), 5, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            // if (this.health != this.maxhealth && this.marked != 1) {
+            //     this.healthbar.draw()
+            // }
+            //this.healthDraw()
+            this.body.draw()
+            // if (this.body.radius == 16) {
+            //     canvas_context.drawImage(this.doodle, this.body.x - 16, this.body.y - 16)
+            // } else {
+            //     canvas_context.drawImage(this.doodle, 0, 0, this.doodle.width, this.doodle.height, this.body.x - this.body.radius, this.body.y - this.body.radius, this.body.radius * 2, this.body.radius * 2)
+            // }
+            this.body.health = this.health
+
+            if (throbert.body.doesPerimeterTouch(this.body)) {
+                const angle = this.playlink.angle()
+                throbert.body.xmom -= Math.cos(angle) * 6.1
+                throbert.body.ymom -= Math.sin(angle) * 6.1
+            }
+        }
+    }
+
+
     class Boubyelega {
         constructor(x, y, colors, pen) {
             this.type = Math.floor(Math.random() * 3)
@@ -6506,6 +6884,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     class Throbert {
         constructor() {
+            this.qsmack = 0
             this.pause = new PauseMenu()
             this.flingframes = 0
             this.haspicked = 0
@@ -7188,7 +7567,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.enemies.push(mobiusring)
 
                 const signaljelly = new Part(7798, 2416, 38)
-                signaljelly.body.radius = 22
+                signaljelly.body.radius = 14
                 this.enemies.push(signaljelly)
 
                 const redthign = new Part(8300, 2689, 39)
@@ -7512,6 +7891,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             charge.volume = Math.min(this.volumeplay, .45)
             if (!gamepadAPI.buttonsStatus.includes('Left-Trigger')) {
                 charge.play()
+            }else{
+                charge.pause()
             }
 
             if (this.grab < 0) {
@@ -7823,7 +8204,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 }
             }
 
-            if (keysPressed['u'] || keysPressed['q'] || gamepadAPI.buttonsStatus.includes('Right-Trigger') || this.whistling == 1) {
+            if (keysPressed['u'] ||keysPressed['c'] || keysPressed['q'] || gamepadAPI.buttonsStatus.includes('Right-Trigger') || this.whistling == 1) {
                 for (let t = 0; t < this.sproutventory.length; t++) {
                     if (this.sproutventory[t].ignore != 1) {
                         if (this.sproutventory[t].grounded != 1) {
@@ -7940,7 +8321,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             this.grab = -3
                             if(this.flingframes < 10){
                                 flingsound.volume = .5
-                                flingsound.currentTime = Math.random() //*1.7
+                                flingsound.currentTime = Math.random()*.7 //*1.7
                                 flingsound.play()
                                 this.flingframes = 50
                             }
@@ -8146,7 +8527,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.sproutventory[t].draw()
 
                 // this.sproutventory[t].body.frictiveMove()
-                if (keysPressed['o'] || keysPressed['e'] || gamepadAPI.buttonsStatus.includes('A') || gamepadAPI.buttonsStatus.includes('Left-Trigger')) {
+                if (keysPressed['o'] ||keysPressed['v'] || keysPressed['e'] || gamepadAPI.buttonsStatus.includes('A') || gamepadAPI.buttonsStatus.includes('Left-Trigger')) {
                     if (length < (this.supersize * 2.2)) {
                         if (this.sproutventory[t].grounded == 1) {
                             this.haspicked++
@@ -8357,7 +8738,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
     let frames = 0
     let oldframes = 0
     ambiance.volume = .01
-    function main() {
+    function main() { 
+        if(keysPressed['9']){
+            throbert.qsmack = 1
+        }
+        if(keysPressed['0']){
+            throbert.qsmack = 0
+        }
         ambiance.volume = .03
         ambiance.play()
 
