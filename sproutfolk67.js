@@ -2096,6 +2096,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     // object instantiation and creation happens here 
 
+
+    const ghost = new Image()
+    ghost.src = "ghost.png"
+
+
     const fcs = new Image()
     fcs.src = "fcsx.png"
     const fcs2 = new Image()
@@ -2192,7 +2197,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             this.carrying = 0
             this.marked = -1000
-
+            // this.ghosts = []
             this.glop = this.body
         }
         path(tar = this.goTo) {
@@ -2499,6 +2504,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
 
         draw() {
+
 
             if (throbert.haspicked <= 1 && this.grounded == 1) {
                 canvas_context.fillStyle = "white"
@@ -2866,6 +2872,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 
+    class Ghost {
+        constructor(x,y,size){
+            this.body = new Circle(x,y-size, size+1, "transparent")
+            this.num = 70
+        }
+        draw(){
+            this.body.y-=1.3
+            this.body.x += Math.sin(this.num/5)
+            canvas_context.globalAlpha = (this.num+5)*.011;
+            canvas_context.drawImage(ghost, (this.num % 9) * (ghost.width / 9), 0, ghost.width / 9, ghost.height, this.body.x - (this.body.radius * 1.0), this.body.y - (this.body.radius * 1.3), this.body.radius * 2.0, this.body.radius * 2.6)
+            canvas_context.globalAlpha = 1
+        }
+    }
+
     class UltraCrab {
         constructor(x, y, colors, pen) {
             this.firstdead = 0
@@ -3035,7 +3055,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 }
                 this.body.angle += this.spin
             } else {
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     this.firstdead = 1
                     this.pulse = 1
                     this.body.radius = 14
@@ -3489,7 +3510,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 }
                 this.body.angle += this.spin
             } else {
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     this.firstdead = 1
                     this.pulse = 1
                     this.body.radius = 14
@@ -3863,7 +3885,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             if (this.health <= 0) {
                 this.body.smove()
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     this.firstdead = 1
                     for (let t = 0; t < enemysounds.length; t++) {
                         if (enemysounds[t].paused) {
@@ -4184,7 +4207,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             if (this.health <= 0) {
                 this.body.smove()
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     this.firstdead = 1
                     for (let t = 0; t < enemysounds.length; t++) {
                         if (enemysounds[t].paused) {
@@ -4555,7 +4579,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             if (this.health <= 0) {
                 this.body.smove()
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     this.firstdead = 1
                     for (let t = 0; t < enemysounds.length; t++) {
                         if (enemysounds[t].paused) {
@@ -4927,7 +4952,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             if (this.health <= 0) {
                 this.body.smove()
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     this.firstdead = 1
                     for (let t = 0; t < enemysounds.length; t++) {
                         if (enemysounds[t].paused) {
@@ -5495,7 +5521,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     }
                 }
             } else {
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     this.firstdead = 1
                     this.body.pulse = 1
                     this.pulse = 1
@@ -5666,7 +5693,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             if (this.health <= 0) {
                 this.body.smove()
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     this.firstdead = 1
                     for (let t = 0; t < enemysounds.length; t++) {
                         if (enemysounds[t].paused) {
@@ -5896,7 +5924,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.smove()
 
 
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     this.firstdead = 1
                     for (let t = 0; t < enemysounds.length; t++) {
                         if (enemysounds[t].paused) {
@@ -6015,7 +6044,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.firstdead = 0
         }
         healthDraw() {
-            this.healthbar = new Healthbox(this.body.x - 6, this.body.y + (this.body.radius * 1.2), 12, 12, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            this.healthbar = new Healthbox(this.body.x - 7.5, this.body.y + (this.body.radius * 1.5), 15, 15, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
             if (this.health != this.maxhealth && this.marked != 1) {
                 this.healthbar.draw((this.health / this.maxhealth))
             }
@@ -6041,16 +6070,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.smove()
 
 
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     let bomb = new HotBomb(this.body.x, this.body.y)
                     bomb.elinks = []
-
                     for (let t = 0; t < throbert.sproutventory.length; t++) {
                         const link = new LineOPD(throbert.sproutventory[t].body, bomb.body)
                         throbert.sproutventory[t].elinks[throbert.sproutventory[t].elinks.length] = link
                         bomb.elinks[t] = link
                     }
-
                     throbert.enemies.push(bomb)
 
                     this.firstdead = 1
@@ -6200,7 +6228,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.body.smove()
 
 
-                if (this.firstdead == 0) {
+               if (this.firstdead == 0) {
+                    throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
                     this.firstdead = 1
                     for (let t = 0; t < enemysounds.length; t++) {
                         if (enemysounds[t].paused) {
@@ -7157,6 +7186,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.paths = []
             this.nodes = []
             this.renode()
+            this.ghosts = []
         }
         renode() {
             //console.time("nodes")
@@ -7214,7 +7244,50 @@ window.addEventListener('DOMContentLoaded', (event) => {
             nodespecial9.big = new CircleS(6346, 7545, 200, "Red")
 
 
-            this.nodes = [nodespecial, nodespecial2, nodespecial3, nodespecial4, nodespecial5, nodespecial6, nodespecial7, nodespecial8, nodespecial9]
+            let xt = 8053
+            let yt = 8081
+            xt = 8053
+            yt = 8081
+           let nodespecial10 = new CircleS(xt, yt, 600, "Red")
+           nodespecial10.priority = 99
+           nodespecial10.small = new CircleS(xt, yt, 20, "Red")
+           nodespecial10.equity = new CircleS(xt, yt, 660, "Red")
+           nodespecial10.big = new CircleS(xt, yt, 200, "Red")
+
+           xt = 7625
+           yt = 8094
+          let nodespecial11 = new CircleS(xt, yt, 600, "Red")
+          nodespecial11.priority = 98
+          nodespecial11.small = new CircleS(xt, yt, 20, "Red")
+          nodespecial11.equity = new CircleS(xt, yt, 660, "Red")
+          nodespecial11.big = new CircleS(xt, yt, 200, "Red")
+
+          xt = 7501
+          yt = 8166
+         let nodespecial12 = new CircleS(xt, yt, 600, "Red")
+         nodespecial12.priority = 8
+         nodespecial12.small = new CircleS(xt, yt, 20, "Red")
+         nodespecial12.equity = new CircleS(xt, yt, 660, "Red")
+         nodespecial12.big = new CircleS(xt, yt, 200, "Red")
+
+         xt = 7645
+         yt = 8579
+        let nodespecial13 = new CircleS(xt, yt, 600, "Red")
+        nodespecial13.priority = 9
+        nodespecial13.small = new CircleS(xt, yt, 20, "Red")
+        nodespecial13.equity = new CircleS(xt, yt, 660, "Red")
+        nodespecial13.big = new CircleS(xt, yt, 200, "Red")
+
+        xt = 6873
+        yt = 7807
+       let nodespecial14 = new CircleS(xt, yt, 600, "Red")
+       nodespecial14.priority = 9
+       nodespecial14.small = new CircleS(xt, yt, 20, "Red")
+       nodespecial14.equity = new CircleS(xt, yt, 660, "Red")
+       nodespecial14.big = new CircleS(xt, yt, 200, "Red")
+
+
+            this.nodes = [nodespecial, nodespecial2, nodespecial3, nodespecial4, nodespecial5, nodespecial6, nodespecial7, nodespecial8, nodespecial9, nodespecial10, nodespecial11, nodespecial12, nodespecial13, nodespecial14]
             for (let t = 0; t < this.nodemap.length; t++) {
                 let node = new CircleS(this.nodemap[t].x, this.nodemap[t].y, 600, "Red")
                 node.priority = this.nodemap[t].z //- (t/100000)
@@ -7505,6 +7578,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
         }
         draw() {
+
+
 
             // if(keysPressed['x']){
             //     this.nodemap.splice(this.nodemap.length-1,1)
@@ -7948,6 +8023,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             canvas_context.drawImage(pit, this.c3.x - 24, this.c3.y - 24)
 
+
+
+            for (let t = 0; t < this.ghosts.length; t++) {
+                if (this.ghosts[t].marked == 1) {
+                    this.ghosts.splice(t, 1)
+                }
+            }
+            for (let t = 0; t < this.ghosts.length; t++) {
+                this.ghosts[t].num--
+                if (this.ghosts[t].num <= 0) {
+                    this.ghosts[t].marked = 1
+                }
+                this.ghosts[t].draw()
+            }
             // for (let t = 0; t < this.nodes.length; t++) {
             //     let link = new LineOP(this.nodes[t], this.body)
             //     if(link.hypotenuse() < 600){
@@ -8947,6 +9036,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
         throbert.draw()
 
+        // let bomb = new HotBomb(throbert.body.x, throbert.body.y)
+        // bomb.elinks = []
+        // for (let t = 0; t < throbert.sproutventory.length; t++) {
+        //     const link = new LineOPD(throbert.sproutventory[t].body, bomb.body)
+        //     throbert.sproutventory[t].elinks[throbert.sproutventory[t].elinks.length] = link
+        //     bomb.elinks[t] = link
+        // }
+        // bomb.active = 1
+        // throbert.enemies.push(bomb)
 
         // for(let t = 0;t<throbert.enemies.length;t++){
         //     throbert.enemies[t].draw()
