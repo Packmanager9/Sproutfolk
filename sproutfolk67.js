@@ -2812,6 +2812,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 if (this.clingTo.pulse >= 1) {
                     this.cling = 0
                 }
+            }else{
+                this.clingTo = {}
             }
             if (this.cling == 1 && this.clingTo.bomb !== 1) {
                 this.body.x = this.clingTo.x + this.clingx + ((Math.random() - .5) * .01)
@@ -3748,6 +3750,393 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 throbert.body.ymom -= Math.sin(angle) * 6.1
             }
 
+        }
+    }
+
+    class Geko {
+        constructor(x,y, colors = [getRandomColor(), getRandomColor(), getRandomColor(), getRandomColor(), getRandomColor()]) {
+            // this.pen = pen
+
+            this.colors = colors
+            this.body = new Circle(x, y, 15, this.colors[0])
+            this.bodyarea = new Circle(x, y, 520, "red")
+            this.go = this.body
+            this.health = 16000
+            this.maxhealth = this.health
+            this.value = 21
+            this.body.timer = 999999999999 * 999999999999
+            this.body.health = this.health
+            this.weight = 21
+            this.body.weight = 1 / this.weight
+            this.body.friction = .9
+            this.playlink = new LineOP(this.body, throbert.body)
+            this.firstdead = 0
+            this.body.angle = Math.random()*2*Math.PI
+            this.tail = []
+            this.tailspeeds = []
+            this.spin = 0
+            this.body.radius *= .7
+            this.clip = 0
+            this.slip = .12
+            for (let t = 0; t < 23; t++) {
+                let circ = new Circle(this.body.x - (t * 12), this.body.y, (this.body.radius*.8) - Math.abs(2 - (t * .2)),  this.colors[0])
+                if (t % 2 == 0) {
+                    circ.color =  this.colors[1]
+                }
+                circ.legs = []
+                if (t == 3 || t == 7 || t == 11 || t == 15 || t == 19) {
+                    for (let k = 0; k < 2; k++) {
+                        let leg = new Circle(circ.x, circ.y, circ.radius * .7,  this.colors[2])
+                        if (t == 3 || t == 11 || t == 19) {
+                            // leg.step = 5
+                            if (t == 11) {
+                                leg.dir = -1
+                            } else {
+
+                                leg.dir = 1
+                            }
+                        } else {
+                            if (t == 7) {
+                                // leg.step = 3
+                                leg.dir = -1
+                            } else {
+                                leg.step = 0
+                                leg.dir = 1
+                            }
+                        }
+
+                        if (t == 3) {
+                            leg.dir = 1
+                            leg.step = 5
+                        }
+                        if (t == 7) {
+                            leg.dir = -1
+                            leg.step = 0
+                        }
+                        if (t == 11) {
+                            leg.dir = 1
+                            leg.step = 5
+                        }
+                        if (t == 15) {
+                            leg.dir = -1
+
+                            leg.step = 0
+                        }
+                        if (t == 19) {
+                            leg.dir = 1
+                            leg.step = 5
+                        }
+
+
+
+                        leg.length = circ.radius * 5
+                        leg.target = new Circle(circ.x, circ.y, circ.radius * .7,  this.colors[2])
+                        leg.elbow = new Circle(circ.x, circ.y, circ.radius * .2,  this.colors[3])
+
+                        leg.jump = 0
+                        if(t == 15 || t == 7 || t == 19) {
+                        }else{
+                            circ.legs.push(leg)
+                        }
+                    }
+                }
+                circ.angle = 0// Math.PI
+                circ.dis = circ.radius * 1.1
+                this.tail.push(circ)
+            }
+            this.body.radius *= 2
+        }
+
+        speedlimit() {
+            let brf = 0
+            if(this.health > 0){
+                while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit*.1) {
+                    brf++
+                    if (brf > 8) {
+                        break
+                    }
+                    this.body.xmom *= .8
+                    this.body.ymom *= .8
+                    this.body.sxmom *= .8
+                    this.body.symom *= .8
+                }
+            }else{
+
+            while (Math.abs(this.body.xmom) + Math.abs(this.body.ymom) + Math.abs(this.body.sxmom) + Math.abs(this.body.symom) > globalspeedlimit) {
+                brf++
+                if (brf > 8) {
+                    break
+                }
+                this.body.xmom *= .8
+                this.body.ymom *= .8
+                this.body.sxmom *= .8
+                this.body.symom *= .8
+            }
+            }
+        }
+        healthDraw() {
+            this.healthbar = new Healthbox(this.body.x - 6.5, this.body.y + (this.body.radius * 1.2), 13, 13, `rgb(${(1 - (this.health / this.maxhealth)) * 255}, ${((this.health / this.maxhealth) * 255)}, ${128})`)
+            if (this.health != this.maxhealth && this.marked != 1) {
+                this.healthbar.draw((this.health / this.maxhealth))
+            }
+        }
+        draw() {
+
+            if (this.playlink.hypotenuse() > 1200) {
+                return
+            }
+
+
+            if(this.health<=0){
+                
+            if (this.firstdead == 0) {
+                throbert.ghosts.push(new Ghost(this.body.x, this.body.y-this.body.radius, this.body.radius))
+                this.firstdead = 1
+                this.pulse = 1
+                // this.body.radius = 14
+                
+            for (let t = 0; t < this.tail.length; t++) {
+                this.tail[t].radius+=2
+                this.tail[t].dis*=.3
+            }
+                this.body.pulse = 1
+                this.crush = 0
+                this.runcrush = 0
+            } else {
+                this.pulse = 0
+                this.body.pulse = 0
+            }
+            }
+            this.body.timer--
+            if (this.body.timer <= 0) {
+                this.spliceout = 1
+            }
+            this.body.set = [this.body.x, this.body.y, 1]
+            // gamepad_control(this.body, 2.5)
+            if(this.health > 0){
+                this.body.xmom += Math.cos(this.body.angle+Math.PI)
+                this.body.ymom += Math.sin(this.body.angle+Math.PI)
+            this.body.frictiveMove()
+
+            }else{
+            this.body.frictiveMove()
+
+            }
+
+            if (this.health > 0) {
+                this.clip += this.slip
+                if (Math.abs(this.clip) > ((Math.PI * .25) + (this.clip * .25))) {
+                    this.slip *= -1
+                }
+            }
+            this.claws = []
+            // if (this.health > 0) {
+                this.angle = this.body.angle + Math.PI / 2.5
+            // }
+            for (let t = 0; t < 4; t++) {
+                const point = new Point(this.body.x + ((this.body.radius * 1.1) * Math.cos(this.angle)), (this.body.y + ((this.body.radius * 1.1) * Math.sin(this.angle))))
+                this.angle += Math.PI / 2.5
+                this.claws.push(point)
+            }
+            for (let t = 0; t < this.claws.length; t++) {
+                const link = new LineOP(this.claws[t], this.body, this.colors[1], 5)
+                link.draw()
+            }
+            for (let t = 0; t < this.claws.length; t++) {
+
+                const link = new LineOP(this.claws[t], this.body, this.colors[1], 2)
+                const hyp = link.angle()
+                const point2 = new Circle(this.claws[t].x + ((this.body.radius * 1.1) * Math.cos(this.clip + hyp)), (this.claws[t].y + ((this.body.radius * 1.1) * Math.sin(this.clip + hyp))), 6, this.colors[0])
+                const point3 = new Circle(this.claws[t].x + ((this.body.radius * 1.1) * Math.cos(-this.clip + hyp)), (this.claws[t].y + ((this.body.radius * 1.1) * Math.sin(-this.clip + hyp))), 6, this.colors[0])
+                const link3 = new LineOP(this.claws[t], point2, this.colors[2], 3)
+                const link2 = new LineOP(this.claws[t], point3, this.colors[3], 3)
+                link3.draw()
+                link2.draw()
+                point2.draw()
+                point3.draw()
+
+                if (this.health > 0) {
+                    if (throbert.body.doesPerimeterTouch(point2)) {
+                        if (throbert.body.doesPerimeterTouch(point3)) {
+                            throbert.health -= 1
+                            if (throbert.health <= 0) {
+                                throbert.health = 0
+                            }
+                        }
+                    }
+
+                    for (let k = 0; k < throbert.sproutventory.length; k++) {
+                        if (this.type == throbert.sproutventory[k].type) {
+                            continue
+                        }
+                        if (throbert.sproutventory[k].fly <= 0 && throbert.sproutventory[k].grounded != 1 && throbert.sproutventory[k].cling != 1) {
+                            if (throbert.sproutventory[k].body.doesPerimeterTouch(point2)) {
+                                if (throbert.sproutventory[k].body.doesPerimeterTouch(point3)) {
+                                    if (throbert.sproutventory[k].bloomdriptimer <= 0) {
+
+                                        if (throbert.sproutventory[k].bloom <= 0) {
+                                            throbert.sproutventory[k].marked = 20
+                                            throbert.sproutventory[k].body.xmom = 0
+                                            throbert.sproutventory[k].body.ymom = 0
+                                            throbert.sproutventory[k].body.friction = 0
+                                        } else {
+                                            throbert.sproutventory[k].bloomdriptimer = 20
+                                            throbert.sproutventory[k].bloom -= 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            this.body.health = this.health
+            if (throbert.body.doesPerimeterTouch(this.body)) {
+                const angle = this.playlink.angle()
+                throbert.body.xmom -= Math.cos(angle) * 6.1
+                throbert.body.ymom -= Math.sin(angle) * 6.1
+            }
+            this.body.draw()
+            this.body.set = [this.body.set[0] - this.body.x, this.body.set[1] - this.body.y, 0]
+            // let link = new Line(this.body.x + this.body.set[0], this.body.y + this.body.set[1], this.body.x, this.body.y)
+            const angle = this.body.angle+this.spin //(link.angle())//+this.body.angle)
+            if(this.health > 0){
+            if(Math.random()<.3){
+                if(Math.random()<.2){
+                    this.spin = -Math.random()*.3
+                }
+                if(Math.random()<.2){
+                    this.spin = Math.random()*.3
+                }
+                if(Math.random()<.8){
+                    this.spin = 0
+                }
+            }
+        }
+            // angle %= Math.PI * 2
+            // if(angle > 0 && this.body.angle < 0){
+            //     this.body.angle+=Math.PI*2
+
+            // }
+            // if (Math.abs(this.body.set[0]) + Math.abs(this.body.set[1]) > 0) {
+                // if  ((Math.abs((angle + (this.body.angle * 3)) / 4) - (this.body.angle)) < .5) {
+                    if(this.health > 0){
+                    this.body.angle = ((angle + (this.body.angle * 3)) / 4)//this.body.angle-(angle*.09)
+                    }
+                    // this.body.angle +=Math.PI
+                    // this.body.angle%=Math.PI*2
+                    // this.body.angle -=Math.PI
+                // } else {
+                //     // angle %= Math.PI*2
+                //     // this.body.angle = (angle + (this.body.angle * 3)) / 4//this.body.angle-(angle*.09)
+                //     // angle += Math.PI*2000000
+                //     // this.body.angle +=Math.PI
+                //     // this.body.angle%=Math.PI*2
+                //     // this.body.angle -=Math.PI
+                //     // if (Math.sign(this.body.angle) < Math.sign(angle)) {
+                //     //     angle += Math.PI*2
+                //     //     this.body.angle = (angle + (this.body.angle * 1)) / 2//this.body.angle-(angle*.09)
+                //     // } else {
+                //     //     angle -= Math.PI*2
+                //     //     this.body.angle = (angle + (this.body.angle * 1)) / 2//this.body.angle-(angle*.09)
+                //     // }
+                //     // this.body.angle +=Math.PI
+                //     // this.body.angle%=Math.PI*2
+                //     // this.body.angle -=Math.PI
+                // }
+            // }
+            // this.body.angle %= Math.PI * 2
+            // console.log(this.body.angle)
+
+            for (let t = 0; t < this.tail.length; t++) {
+
+                if (throbert.body.doesPerimeterTouch(this.tail[t])) {
+                    // const angle = this.playlink.angle()
+                    const angle = (new LineOP(this.tail[t], throbert.body)).angle()
+                    throbert.body.xmom -= Math.cos(angle) * 7.1
+                    throbert.body.ymom -= Math.sin(angle) * 7.1
+                    // break
+                }
+            }
+            for (let t = 0; t < this.tail.length; t++) {
+
+                if (t > 0) {
+                    if (Math.abs(this.body.set[0]) + Math.abs(this.body.set[1]) > 0) {
+                        this.tail[t].angle = ((this.tail[t - 1].angle * 1.05) + (this.tail[t].angle * 6)) / 7.05
+                    }
+                    this.tail[t].x = this.tail[t - 1].x + (Math.cos(this.tail[t].angle) * this.tail[t].dis)
+                    this.tail[t].y = this.tail[t - 1].y + (Math.sin(this.tail[t].angle) * this.tail[t].dis)
+                } else {
+                    if (Math.abs(this.body.set[0]) + Math.abs(this.body.set[1]) > 0) {
+                        this.tail[t].angle = ((this.body.angle * 11.05) + this.tail[t].angle) / 12.05
+                    }
+                    this.tail[t].x = this.body.x + (Math.cos(this.tail[t].angle) * this.tail[t].dis)
+                    this.tail[t].y = this.body.y + (Math.sin(this.tail[t].angle) * this.tail[t].dis)
+                }
+                for (let k = 0; k < this.tail[t].legs.length; k++) {
+                    // let link = new LineOP(this.tail[t], this.tail[t].legs[k],  this.colors[2], 2)
+                    let ang = (this.tail[t].angle + (Math.PI * .5 * Math.sign(k - .5))) - (((Math.PI * .33)) * (this.tail[t].legs[k].step / 10))
+
+                    if (Math.abs(this.body.set[0]) + Math.abs(this.body.set[1]) > 0 && this.health > 0) {
+                        this.tail[t].legs[k].step += this.tail[t].legs[k].dir
+                        if (Math.abs(this.tail[t].legs[k].step) >= 6) {
+
+                            //  if(link.hypotenuse() > this.tail[t].legs[k].length){
+                            // this.tail[t].legs[k].step = 2
+                            let ang = (this.tail[t].angle + (Math.PI * .5 * Math.sign(k - .5))) - (((Math.PI * .33)) * (this.tail[t].legs[k].step / 6))
+
+                            this.tail[t].legs[k].dir *= -1
+                            this.tail[t].legs[k].target.x = this.tail[t].x + (Math.cos(ang) * this.tail[t].legs[k].length)
+                            this.tail[t].legs[k].target.y = this.tail[t].y + (Math.sin(ang) * this.tail[t].legs[k].length)
+                        }
+
+                        // gamepad_control(this.tail[t].legs[k].target, 1)
+
+
+
+                        this.tail[t].legs[k].xmom = (this.tail[t].legs[k].target.x - this.tail[t].legs[k].x) / 5
+                        this.tail[t].legs[k].ymom = (this.tail[t].legs[k].target.y - this.tail[t].legs[k].y) / 5
+
+                    }else{
+
+                        this.tail[t].legs[k].xmom = (this.tail[t].x - this.tail[t].legs[k].x) / (10+Math.sign(k-.5))
+                        this.tail[t].legs[k].ymom = (this.tail[t].y - this.tail[t].legs[k].y) / (10+Math.sign(k-.5))
+
+                        this.tail[t].legs[k].move()
+                    }
+
+                    if (this.tail[t].legs[k].doesPerimeterTouch(this.tail[t].legs[k].target)) {
+
+                    } else {
+                        this.tail[t].legs[k].move()
+                    }
+
+                    let point = new Point((this.tail[t].legs[k].x + this.tail[t].x) * .5, (this.tail[t].legs[k].y + this.tail[t].y) * .5)
+                    let mpoint = new Point(point.x + (Math.cos(ang - .2) * this.tail[t].legs[k].length * .2), point.y + (Math.sin(ang - .2) * this.tail[t].legs[k].length * .2))
+                    this.tail[t].legs[k].elbow.x = mpoint.x
+                    this.tail[t].legs[k].elbow.y = mpoint.y
+
+                    this.elink1 = new LineOP(this.tail[t].legs[k].elbow, this.tail[t],  this.colors[2], 7)
+                    this.elink2 = new LineOP(this.tail[t].legs[k].elbow, this.tail[t].legs[k],  this.colors[2], 4)
+
+
+                    this.tail[t].legs[k].elbow.draw()
+                    this.tail[t].legs[k].draw()
+                    // link.draw()
+                    this.elink1.draw()
+                    this.elink2.draw()
+
+                }
+                this.tail[t].draw()
+                // let poly = new Polygon(this.tail[t].x, this.tail[t].y, this.tail[t].radius*2, this.tail[t].color, 4)
+                // poly.angle= this.body.angle-(Math.PI*.25)
+                // poly.draw()
+
+            }
+            // if(this.health<this.maxhealth){
+            //     this.healthDraw()
+            // }
         }
     }
     class Crab {
@@ -8847,6 +9236,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     plug.body.y *= 2
                     this.enemies.push(plug)
                 }
+                for (let t = 0; t < 10; t++) {
+                    const plug = new Geko(5120 + ((Math.random() - .5) * 10240), 5120 + ((Math.random() - .5) * 10240))
+                    // plug.body.x *= 2
+                    // plug.body.y *= 2
+                    this.enemies.push(plug)
+                }
                 for (let t = 0; t < 12; t++) {
                     const plug = new Barslezler(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
                     plug.body.x *= 2
@@ -8957,6 +9352,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     this.sproutventory[k].links[t] = link
                 }
             }
+
+            this.grab = 0
         }
         save(){
             let json = {}
@@ -9731,6 +10128,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     plug.body.y *= 2
                     this.enemies.push(plug)
                 }
+                for (let t = 0; t < 10; t++) {
+                    const plug = new Geko(5120 + ((Math.random() - .5) * 10240), 5120 + ((Math.random() - .5) * 10240))
+                    // plug.body.x *= 2
+                    // plug.body.y *= 2
+                    this.enemies.push(plug)
+                }
                 for (let t = 0; t < 12; t++) {
                     const plug = new Barslezler(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
                     plug.body.x *= 2
@@ -10257,6 +10660,26 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                         this.sproutventory[k].carrying = 0
                                     }
                                 }
+                            }else if(typeof this.enemies[t].tail != "undefined"){
+                                for(let g = 0;g<this.enemies[t].tail.length;g++){
+                                    if(this.enemies[t].tail[g].doesPerimeterTouch(this.sproutventory[k].body)) {
+                                        this.enemies[t].health -= (this.sproutventory[k].damage * (1 + (this.sproutventory[k].bloom * .2)))*.5// .5 to make head value
+                                        if (this.sproutventory[k].fly > 0) {
+                                            this.enemies[t].health -= ((this.sproutventory[k].damage * (1 + (this.sproutventory[k].bloom * .2)) * this.sproutventory[k].fly))*.5// .5 to make head value
+                                            if (this.sproutventory[k].type == 2) {
+                                                this.enemies[t].health -=( ((this.sproutventory[k].damage * (1 + (this.sproutventory[k].bloom * .2)) * this.sproutventory[k].fly)) * .5)*.5 // .5 to make head value
+                                            }
+                                        }
+                                        if (this.enemies[t].health <= 0) {
+                                            this.enemies[t].marked = 1
+                                            this.sproutventory[k].carrying = 1
+                                        } else {
+                                            this.sproutventory[k].carrying = 0
+                                        }
+
+                                        g = 100000
+                                    }
+                                }
                             }
 
                             if (this.enemies[t].body.doesPerimeterTouch(this.sproutventory[k].body)) {
@@ -10297,6 +10720,64 @@ window.addEventListener('DOMContentLoaded', (event) => {
                                     this.sproutventory[k].cling = 0
                                 }
 
+                            }else if(typeof this.enemies[t].tail != "undefined"){
+                                for(let g = 0;g<this.enemies[t].tail.length;g++){
+                                    if(this.enemies[t].tail[g].doesPerimeterTouch(this.sproutventory[k].body)) {
+                                        
+                                        if (this.enemies[t].health <= 0) {
+                                            this.enemies[t].marked = 1
+                                            this.sproutventory[k].carrying = 1
+                                        } else {
+                                            this.sproutventory[k].carrying = 0
+                                        }
+        
+                                        if (this.clingfilm == 1 || this.sproutventory[k].fly > 0 || this.sproutventory[k].attent <= 0  || this.enemies[t].tail.includes(this.sproutventory[k].clingTo)) {
+                                            if (this.sproutventory[k].cling != 1 && this.enemies[t].bomb != 1 || (this.enemies[t].tail.includes(this.sproutventory[k].clingTo))) {
+                                                if(this.enemies[t].health > 0){
+                                                this.sproutventory[k].clingTo = this.enemies[t].tail[g]
+                                                this.sproutventory[k].clingx = -(this.enemies[t].tail[g].x - this.sproutventory[k].body.x)*.7
+                                                this.sproutventory[k].clingy = -(this.enemies[t].tail[g].y - this.sproutventory[k].body.y)*.7
+                                                }else{
+                                                    this.sproutventory[k].clingTo = this.enemies[t].body
+                                                    this.sproutventory[k].clingx = -(this.enemies[t].body.x - this.sproutventory[k].body.x)
+                                                    this.sproutventory[k].clingy = -(this.enemies[t].body.y - this.sproutventory[k].body.y)
+                                                    const vec = new Vector({}, this.sproutventory[k].clingx,this.sproutventory[k].clingy)
+                                                    vec.normalize(this.enemies[t].body.radius)
+
+                                                    this.sproutventory[k].clingx = vec.xmom
+                                                    this.sproutventory[k].clingy = vec.ymom
+                                                }
+                                            }
+                                            if (this.enemies[t].spliceout != 1) {
+                                                if (this.sproutventory[k].cling != 1) {
+                                                    if (this.enemies[t].nectar != 1 && this.enemies[t].bomb != 1) {
+                                                        this.sproutventory[k].cling = 1
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            if (this.enemies[t].bomb != 1) {
+                                                this.sproutventory[k].body.xmom += Math.cos(angle) * 2.2
+                                                this.sproutventory[k].body.ymom += Math.sin(angle) * 2.2
+                                            }
+                                        }
+        
+                                        if (this.enemies[t].pulse >= 1) {
+                                            if (this.sproutventory[k].cling == 1) {
+                                                let link = new LineOP(this.sproutventory[k].body, this.sproutventory[k].clingTo)
+                                                let hyp = link.angle()
+                                                this.sproutventory[k].body.xmom = (Math.cos(hyp)) * 9 * this.enemies[t].pulse  //-(this.sproutventory[t].clingTo.x - this.sproutventory[t].body.x) * 1
+                                                this.sproutventory[k].body.ymom = (Math.sin(hyp)) * 9 * this.enemies[t].pulse  //-(this.sproutventory[t].clingTo.y - this.sproutventory[t].body.y) * 1
+                                            }
+                                            this.sproutventory[k].cling = 0
+                                        }
+
+
+
+
+                                        g = 100000
+                                    }
+                                }
                             }
                         }
                     }
