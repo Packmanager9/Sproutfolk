@@ -1,9 +1,17 @@
 //replace enemy and throbert movement with mag calcs
 //also do the vsum if you can for path2 calcs
+// let GE = {}
+var global; //like ge
+try {
+    global = Function('return this')() || (42, eval)('this');
+} catch (e) {
+    global = window;
+}
+
 window.addEventListener('DOMContentLoaded', (event) => {
 
 
-    const savestates = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
+    let savestates = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
     const eleven = 11
     const ten = 10
@@ -1792,6 +1800,153 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
     function setUp(canvas_pass, style = "#000055") {
         canvas = canvas_pass
+        canvas.ondrop = dropHandler
+
+
+
+        canvas.ondragover = function (e) {
+            e.preventDefault();
+            return false;
+        };
+
+
+        // let form = document.querySelector('#upload');
+        let file = document.querySelector('.canvas');
+        file.value = {}
+        file.files = []
+        file.value.length = 1
+        console.log(file.value)
+
+        // form.addEventListener('submit', handleSubmit);
+
+
+        function dropHandler(ev) {
+            let reader = new FileReader();
+
+
+            console.log('File(s) dropped');
+
+            // Prevent default behavior (Prevent file from being opened)
+            ev.preventDefault();
+
+            if (ev.dataTransfer.items) {
+                // Use DataTransferItemList interface to access the file(s)
+                for (let i = 0; i < ev.dataTransfer.items.length; i++) {
+                    // If dropped items aren't files, reject them
+                    if (ev.dataTransfer.items[i].kind === 'file') {
+                        const file = ev.dataTransfer.items[i].getAsFile();
+                        console.log('... file[' + i + '].name = ' + file.name);
+                        //   console.log((file.text()))
+                        file.text().then(result => {
+                            savestates = JSON.parse(result)
+                        }).catch(err => {
+                            // process error here
+                        });
+
+
+
+
+                    }
+                }
+            } else {
+                // Use DataTransfer interface to access the file(s)
+                for (let i = 0; i < ev.dataTransfer.files.length; i++) {
+                    console.log('... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
+                }
+            }
+        }
+
+
+
+        // function dropHandler (event) {
+
+        // 	// Stop the form from reloading the page
+        // 	event.preventDefault();
+        //     console.log(event.target.files)
+        //     GE = event
+        // 	// If there's no file, do nothing
+        // 	if (!file.value.length) return;
+
+        // 	// Create a new FileReader() object
+        // 	let reader = new FileReader();
+
+        // 	// Setup the callback event to run when the file is read
+        // 	let str = event.target.result;
+        //     file.files[0] = new Blob(str, {type : 'application/json'})
+        // 	// let json = JSON.parse(str);
+        //     console.log(str)
+
+        // 	// Read the file
+        // 	console.log((reader.readAsText(file.files[0])))
+
+        // }
+
+
+        function logFile(event) {
+
+            // let pomaosto = []
+            // for(let t = 0;t<json.pomaos.length;t++){
+            //     let dummymao = new GardenPomaoranian(json.pomaos[t].body.x, json.pomaos[t].body.y)
+            //     let keys = Object.keys(json.pomaos[t])
+            //     for(let k = 0;k<keys.length;k++){
+            //         if(keys[k] != 'tongue' && keys[k] != 'centrix' && keys[k] != 'body'&& keys[k] != 'link'){
+            //             dummymao[keys[k]] = json.pomaos[t][keys[k]] 
+            //         }
+            //     }
+            //     pomaosto.push(dummymao)
+            // }
+            // pomaos = [...pomaosto]
+        }
+
+        //   function dropHandler(ev) {
+
+        //     // Prevent default behavior (Prevent file from being opened)
+        //     ev.preventDefault();
+
+        //     if (ev.dataTransfer.items) {
+        //       // Use DataTransferItemList interface to access the file(s)
+        //       for (let i = 0; i < ev.dataTransfer.items.length; i++) {
+        //         // If dropped items aren't files, reject them
+        //         if (ev.dataTransfer.items[i].kind === 'file') {
+        //           const file = ev.dataTransfer.items[i].getAsFile();
+        //         //   var fr=new FileReader();
+        //         readTextFile(file)
+
+        //         //   console.log(fr.readAsText(new Blob(ev.dataTransfer.items[i])))
+
+        //         //   savestates =JSON.parse(file[0])
+        //           console.log('... file[' + i + '].name = ' + file.name);
+        //         }
+        //       }
+        //     } else {
+        //       // Use DataTransfer interface to access the file(s)
+        //       for (let i = 0; i < ev.dataTransfer.files.length; i++) {
+        //         console.log('... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
+        //       }
+        //     }
+        //   }
+
+        //   function readTextFile(file, callback) {
+        //     var rawFile = new XMLHttpRequest();
+        //     rawFile.overrideMimeType("application/json");
+        //     rawFile.open("GET", file, true);
+        //     rawFile.onreadystatechange = function() {
+        //         if (rawFile.readyState === 4 && rawFile.status == "200") {
+        //             callback(rawFile.responseText);
+        //         }
+        //     }
+        //     rawFile.send(null);
+        // }
+
+        // readTextFile(file, function(text){
+        //     var data = JSON.parse(text);
+        //     console.log(data);
+        // });
+        //usage:
+
+
+
+
         // video_recorder = new CanvasCaptureToWEBM(canvas, 4000000);
         canvas_context = canvas.getContext('2d');
         // canvas_context.imageSmoothingEnabled = true
@@ -1978,6 +2133,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
     }
+    function export2js(originalData) {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(originalData, null, 2)], {
+            type: "Json"
+        }));
+        a.setAttribute("download", "Warm Itzler Saves.json");
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+
+
+
     function getRandomLightColor() { // random color that will be visible on  black background
         var letters = '0123456789ABCDEF';
         var color = '#';
@@ -8107,10 +8276,34 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.buttons.push(new MenuButton(100, 300, "Itzlerpedia"))
             this.buttons.push(new MenuButton(100, 350, "Part Notes"))
             this.buttons.push(new MenuButton(100, 450, "Player stats"))
+            this.buttons.push(new MenuButton(100, 550, "Save"))
+            this.buttons.push(new MenuButton(100, 590, "Load"))
+            this.buttons.push(new MenuButton(100, 630, "Export Saves"))
             this.state = -1
             this.states = []
         }
         buttonz(point) {
+            if (this.state == 6) {
+                for (let t = 0; t < savestates.length; t++) {
+                    let rect = new Rectangle(this.body.x + 750, this.body.y + 300 + (22 * t), 100, 20, "red")
+                    // canvas_context.fillText("File: " + t, rect.x + 20, rect.y + 10)
+                    if (rect.y > throbert.body.y + 340) {
+                        rect.x += 120
+                        let z = (this.body.y + 300 + (22 * t)) - 400
+                        rect.y = z + (t % 19) * 22
+                    }
+                    if (savestates[t].exist == 1) {
+                        if (rect.isPointInside(point)) {
+                            throbert.load(savestates[t])
+                            this.paused = 0
+                            this.state = -1
+                        }
+                    }
+                }
+
+            }
+
+
             for (let t = 0; t < this.buttons.length; t++) {
                 if (this.buttons[t].body.isPointInside(point)) {
                     this.state = t
@@ -8129,7 +8322,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 canvas_context.fillText("Paused", this.body.x + 550, this.body.y + 100)
                 canvas_context.font = "20px arial"
                 canvas_context.fillStyle = "white"
-                canvas_context.fillText("Space or 'Back' to unpause, or click the Return option", this.body.x + 400, this.body.y + 140)
+                canvas_context.fillText("Escape or 'Back' to unpause, or click the Return option", this.body.x + 400, this.body.y + 140)
                 if (this.state != -1) {
                     if (this.state == 0) {
                         this.paused = 0
@@ -8145,12 +8338,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         megamap_context.drawImage(throbert.captain, 0, 0, throbert.captain.width, throbert.captain.height, Math.round((throbert.body.x * (megamap.width / 10240)) - (throbert.body.radius * (20 * (megamap.width / 10240)))), Math.round((throbert.body.y * (megamap.height / 10240)) - (throbert.body.radius * (20 * (megamap.height / 10240)))), (40 * (megamap.width / 10240)) * throbert.body.radius, (40 * (megamap.height / 10240)) * throbert.body.radius)
                         canvas_context.drawImage(megamap, 0, 0, megamap.width, megamap.height, throbert.body.x + 200, throbert.body.y - 200, 320, 320) ///, 1024, 1024, 0, 0, 10240, 10240)
                     } else if (this.state == 2) {
-                        //pedia
+                        // for (let t = 0; t < throbert.partslog.length; t++) {
+                        canvas_context.font = "20px arial"
+                        canvas_context.fillStyle = "white"
+                        canvas_context.fillText("pending", this.body.x + 750, this.body.y + 300)
+                        // }
                     } else if (this.state == 3) {
                         for (let t = 0; t < throbert.partslog.length; t++) {
                             canvas_context.font = "20px arial"
                             canvas_context.fillStyle = "white"
-                            canvas_context.fillText(throbert.partslog[t], this.body.x + 750, this.body.y + 300+(t*22))
+                            canvas_context.fillText(throbert.partslog[t], this.body.x + 750 + (Math.floor(throbert.partslog[t] % 5) * 22), this.body.y + 300 + (Math.floor(throbert.partslog[t] / 5) * 22))
                         }
                     } else if (this.state == 4) {
                         canvas_context.font = "20px arial"
@@ -8179,9 +8376,49 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         canvas_context.fillText("Warm Itzlerians Sprouted: " + throbert.spawned, this.body.x + 750, this.body.y + 340)
                         canvas_context.fillText("Warm Itzlerians Perished: " + throbert.died, this.body.x + 750, this.body.y + 360)
                         canvas_context.fillText("Enemies Defeated: " + throbert.edead, this.body.x + 750, this.body.y + 380)
+                    } else if (this.state == 5) {
+                        this.buttons[this.state].body.color = "red"
+                        if (!(throbert.savecooldown > 0)) {
+                            throbert.save()
+                            throbert.savecooldown = 10
+                            this.state = -1
+                        } else {
+                            this.buttons[this.state].body.color = "green"
+                        }
+                    } else if (this.state == 6) {
+
+                        canvas_context.font = "30px arial"
+                        canvas_context.fillStyle = "white"
+                        canvas_context.fillText("Files:", this.body.x + 750, this.body.y + 250)
+
+                        for (let t = 0; t < savestates.length; t++) {
+                            if (savestates[t].exist == 1) {
+                                let rect = new Rectangle(this.body.x + 750, this.body.y + 300 + (22 * t), 100, 20, "red")
+                                if (rect.y > throbert.body.y + 340) {
+                                    rect.x += 120
+                                    let z = (this.body.y + 300 + (22 * t)) - 400
+                                    rect.y = z + (t % 19) * 22
+                                }
+
+                                rect.draw()
+                                canvas_context.font = "17px arial"
+                                canvas_context.fillStyle = "white"
+                                canvas_context.fillText("File: " + t, rect.x + 20, rect.y + 17)
+                            }
+                        }
+                        // this.paused = 0
+                        // this.state = -1
+                    } else if (this.state == 7) {
+                        export2js(savestates)
+                        this.state = -1
                     }
                 }
 
+                if (!(throbert.savecooldown > 0)) {
+                    this.buttons[5].body.color = "red"
+                } else {
+                    this.buttons[5].body.color = "green"
+                }
 
                 for (let t = 0; t < this.buttons.length; t++) {
                     this.buttons[t].draw()
@@ -9002,8 +9239,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
         load(json) {
             // this.loaded = 1
             this.sproutventory = []
-            this.haspicked = 1
-            this.first = 0
+            this.haspicked = 2
+            // this.first = 0
             canvas_context.translate(this.body.x - json.man.x, this.body.y - json.man.y)
             this.body.x = json.man.x
             this.body.y = json.man.y
@@ -9016,390 +9253,97 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
 
 
-
-            if (this.first == 0) {
-                this.first = 1
-                this.enemies = [] //[new Gloobleglat(2300, 2660), new Gloobleglat(2560, 2800), new Gloobleglat(2860, 2660), new Gloobleglat(2300 + 900, 2560), new Gloobleglat(2560, 2800 + 900), new Gloobleglat(2860 + 900, 2560 + 900)]
-
-
-
-                const engine = new Part(4800, 4800, 0)
-                this.enemies.push(engine)
-
-                const rotor = new Part(6500, 6500, 1)
-                rotor.body.color = "#909090"
-                this.enemies.push(rotor)
-
-                const orbpart = new Part(600, 6500, 2)
-                orbpart.body.color = "#FFFF00"
-                this.enemies.push(orbpart)
-
-                const snakepartpart = new Part(4700, 7333, 3)
-                snakepartpart.body.color = "#00AA00"
-                this.enemies.push(snakepartpart)
-
-                const bupplepart = new Part(6472, 1346, 4)
-                bupplepart.body.radius *= .75
-                bupplepart.body.color = "#DDDDDD"
-                this.enemies.push(bupplepart)
-
-                const armpart = new Part(3883, 3223, 5)
-                armpart.body.radius *= .75
-                armpart.body.color = "#FF00AA"
-                this.enemies.push(armpart)
-
-                const fuelpart = new Part(9000, 300, 6)
-                fuelpart.body.color = "#000000"
-                fuelpart.body.radius *= .75
-                this.enemies.push(fuelpart)
-
-                const clockpart = new Part(5200, 4143, 7)
-                clockpart.body.color = "#FFFFFF"
-                // clockpart.body.radius *= .75
-                clockpart.body.radius *= 2
-                this.enemies.push(clockpart)
-
-                const warjar = new Part(6200, 9200, 8)
-                warjar.body.color = "#8844FF"
-                warjar.body.radius *= 2
-                this.enemies.push(warjar)
-
-
-                const brainjar = new Part(4467, 6529, 9)
-                brainjar.body.color = "#FF8844"
-                this.enemies.push(brainjar)
-
-
-                const mirrorjar = new Part(9000, 9000, 10)
-                mirrorjar.body.color = "#090909"
-                mirrorjar.body.radius = 39
-                this.enemies.push(mirrorjar)
-
-
-
-                const radarpart = new Part(1111, 1111, 11)
-                radarpart.body.color = "#000000"
-                radarpart.body.radius = 35
-                this.enemies.push(radarpart)
-
-
-
-                const drivepart = new Part(8100, 6900, 12)
-                drivepart.body.color = "#00DD55"
-                drivepart.body.radius = 25
-                this.enemies.push(drivepart)
-
-                const boider = new Part(1450, 9500, 13)
-                boider.body.color = "#AAFFAA"
-                boider.body.radius = 35
-                this.enemies.push(boider)
-
-                const comber = new Part(9000, 6000, 14)
-                comber.body.color = "#090919"
-                comber.body.radius = 40
-                this.enemies.push(comber)
-
-                const labb = new Part(7100, 3000, 15)
-                labb.body.color = "#090919"
-                labb.body.radius = 25
-                this.enemies.push(labb)
-
-                const fuleline = new Part(7200, 9800, 16)
-                fuleline.body.color = "#FFFFFF"
-                fuleline.body.radius = 25
-                this.enemies.push(fuleline)
-
-                const drone = new Part(5120, 9800, 17)
-                drone.body.color = "#090909"
-                drone.body.radius = 41
-                this.enemies.push(drone)
-
-                const filter = new Part(3200, 6000, 18)
-                filter.body.color = "#090909"
-                filter.body.radius = 25
-                this.enemies.push(filter)
-
-                const hole = new Part(5623, 3800, 19)
-                hole.body.color = "#090909"
-                hole.body.radius = 25
-                this.enemies.push(hole)
-
-                const lamp = new Part(4623, 3800, 20)
-                lamp.body.color = "#090909"
-                lamp.body.radius = 25
-                this.enemies.push(lamp)
-
-                const heater = new Part(4200, 7657, 21)
-                heater.body.color = "#FFAA00"
-                heater.body.radius = 25
-                this.enemies.push(heater)
-
-                const tv = new Part(5252, 7512, 22)
-                tv.body.color = "#777777"
-                tv.body.radius = 25
-                this.enemies.push(tv)
-
-                const waterparts = new Part(2800, 8712, 23)
-                waterparts.body.color = "#0000ff"
-                waterparts.body.radius = 32
-                this.enemies.push(waterparts)
-
-                const hydro = new Part(2800, 8012, 24)
-                hydro.body.color = "#00FF00"
-                hydro.body.radius = 20
-                this.enemies.push(hydro)
-
-                const ammo = new Part(6524, 2706, 25)
-                ammo.body.color = "#00FF00"
-                ammo.body.radius = 25
-                this.enemies.push(ammo)
-
-                const heart = new Part(4000, 5038, 26)
-                heart.body.color = "#00FFFF"
-                heart.body.radius = 25
-                this.enemies.push(heart)
-
-                const prop = new Part(1960, 5211, 27)
-                prop.body.color = "#00FFFF00"
-                prop.body.radius = 25
-                this.enemies.push(prop)
-
-                const stereo = new Part(890, 980, 28)
-                stereo.body.color = "#000000"
-                stereo.body.radius = 20
-                this.enemies.push(stereo)
-
-                const target = new Part(1500, 400, 29)
-                target.body.color = "#000000"
-                target.body.radius = 40
-                this.enemies.push(target)
-
-
-                const thermometer = new Part(8300, 8136, 30)
-                thermometer.body.color = "#FFAA4488"
-                thermometer.body.radius = 30
-                this.enemies.push(thermometer)
-
-
-                const pannel = new Part(7500, 7866, 31)
-                pannel.body.color = "#FFAA4488"
-                pannel.body.radius = 30
-                this.enemies.push(pannel)
-
-                const rngmachine = new Part(5772, 5943, 32)
-                rngmachine.body.color = "#FFAA4488"
-                rngmachine.body.radius = 30
-                this.enemies.push(rngmachine)
-
-                const porterr = new Part(6500, 7557, 33)
-                porterr.body.radius = 30
-                this.enemies.push(porterr)
-
-                const rainmachine = new Part(7519, 5684, 34)
-                rainmachine.body.radius = 30
-                this.enemies.push(rainmachine)
-
-                const turnsignal = new Part(5682, 6536, 35)
-                turnsignal.body.radius = 30
-                this.enemies.push(turnsignal)
-
-                const flingersponge = new Part(8074, 4453, 36)
-                flingersponge.body.radius = 30
-                this.enemies.push(flingersponge)
-
-                const mobiusring = new Part(8574, 3753, 37)
-                mobiusring.body.radius = 22
-                this.enemies.push(mobiusring)
-
-                const signaljelly = new Part(7798, 2416, 38)
-                signaljelly.body.radius = 14
-                this.enemies.push(signaljelly)
-
-                const redthign = new Part(8300, 2689, 39)
-                redthign.body.radius = 22
-                this.enemies.push(redthign)
-
-                const ringuses = new Part(400, 6000, 40)
-                ringuses.body.radius = 25
-                this.enemies.push(ringuses)
-
-
-
-
-                // for(let t = 0;t<9;t++){
-                //     const target = new Part(0, 0, 31+t)
-                //     target.body.color = "#000000"
-                //     target.body.radius = 30
-                //     this.enemies.push(target)
-
-                // }
-
-
-
-
-
-
-
-
-                // let mod = 5
-                // let x = 4700
-                // let y = 4700
-                // for(let t = 0;t<this.enemies.length;t++){
-
-                //     if(t%8 == 0 && t>0){
-                //         x = 4700
-                //         y+=110
-                //     }
-                //     this.enemies[t].body.x = x
-                //     this.enemies[t].body.y = y
-                //     x+=130
-                // }
-
-
-                for (let t = 0; t < 8; t++) {
-                    const plug = new Crab(3200 + ((Math.random() - .5) * 400), 3200 + ((Math.random() - .5) * 400), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 8; t++) {
-                    const plug = new Crab(2205 + ((Math.random() - .5) * 200), 3275 + ((Math.random() - .5) * 200), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 8; t++) {
-                    const plug = new Ploorenab(1600 + ((Math.random() - .5) * 400), 3350 + ((Math.random() - .5) * 400), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 18; t++) {
-                    const plug = new Gloobleglat(480 + ((Math.random() - .5) * 800), 2934 + ((Math.random() - .5) * 700), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 8; t++) {
-                    const plug = new Gloobleglat(2200 + ((Math.random() - .5) * 400), 4700 + ((Math.random() - .5) * 400), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 3; t++) {
-                    const plug = new Ploorenab(2200 + ((Math.random() - .5) * 400), 4700 + ((Math.random() - .5) * 400), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
+            this.enemies = []
+
+            for(let t = 0 ;t<json.enemies.length;t++){
+                // console.log(window)
+                // console.log(json.enemies[t].n)
+                if(json.enemies[t].n == "Ploorenab"){
+                    const enemy = new Ploorenab(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Gloobleglat"){
+                    const enemy = new Gloobleglat(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Hoggelspouzer"){
+                    const enemy = new Hoggelspouzer(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Exploorenab"){
+                    const enemy = new Exploorenab(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "HotBomb"){
+                    const enemy = new HotBomb(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Geko"){
+                    const enemy = new Geko(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Boomelspoinker"){
+                    const enemy = new Boomelspoinker(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Boubyelega"){
+                    const enemy = new Boubyelega(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Boubyelega"){
+                    const enemy = new Boubyelega(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Part"){
+                    const enemy = new Part(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                    this.enemies[t].type = json.enemies[t].t
+                }else if(json.enemies[t].n == "Wallatoid"){
+                    const enemy = new Wallatoid(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Cannonboss"){
+                    const enemy = new Cannonboss(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Stomplegs"){
+                    const enemy = new Stomplegs(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "UltraCrab"){
+                    const enemy = new UltraCrab(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "GooGumber"){
+                    const enemy = new GooGumber(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Crab"){
+                    const enemy = new Crab(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Nectar"){
+                    const enemy = new Nectar(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
+                }else if(json.enemies[t].n == "Barslezler"){
+                    const enemy = new Barslezler(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
+                    this.enemies.push(enemy)
                 }
 
-                // for (let t = 0; t < 200; t++) {
-                //     const plug = new Wallatoid(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                //     plug.body.x *= 2
-                //     plug.body.y *= 2
-                //     this.enemies.push(plug)
-                // }
-                for (let t = 0; t < 200; t++) {
-                    const plug = new Ploorenab(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 10; t++) {
-                    const plug = new Geko(5120 + ((Math.random() - .5) * 10240), 5120 + ((Math.random() - .5) * 10240))
-                    // plug.body.x *= 2
-                    // plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 12; t++) {
-                    const plug = new Barslezler(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 40; t++) {
-                    const plug = new Exploorenab(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-
-                for (let t = 0; t < 60; t++) {
-                    const plug = new HotBomb(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 70; t++) {
-                    const plug = new Gloobleglat(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 14; t++) {
-                    const plug = new Boubyelega(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 14; t++) {
-                    const plug = new GooGumber(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 14; t++) {
-                    const plug = new Hoggelspouzer(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 20; t++) {
-                    const plug = new Crab(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                    plug.body.x *= 2
-                    plug.body.y *= 2
-                    this.enemies.push(plug)
-                }
-                for (let t = 0; t < 90; t++) {
-                    const nec = new Nectar(2560 + ((Math.random() - .5) * 5120), 2560 + ((Math.random() - .5) * 5120), ['red', "magenta", "orange"])
-                    nec.body.x *= 2
-                    nec.body.y *= 2
-                    this.enemies.push(nec)
-                }
-
-                const cannonboss = new Cannonboss(6172, 1646, ['red', "magenta", "orange"])
-                this.enemies.push(cannonboss)
-
-                const crabboss = new UltraCrab(3200 + ((Math.random() - .5) * 400), 3200 + ((Math.random() - .5) * 400), ['red', "magenta", "orange"])
-                crabboss.body.x *= 2
-                crabboss.body.y *= 2
-                this.enemies.push(crabboss)
-
-                const plug = new Hoggelspouzer(2762, 5700, ['red', "magenta", "orange"])
-                // plug.body.x *= 2
-                // plug.body.y *= 2
-                this.enemies.push(plug)
+                // this.enemies[t].type = json.enemies[t].t
 
 
-                const stomplegs = new Stomplegs(4367, 6629, ['red', "magenta", "orange"])
-                // crabboss.body.x *= 2
-                // crabboss.body.y *= 2
-                this.enemies.push(stomplegs)
+
+                // const enemy = new window[`${}`](json.enemies[t].x, json.enemies[t].y, json.enemies[t].t)
+                // // console.log(enemy)
+                // this.enemies.push(enemy)
+            }
 
 
-                for (let k = 0; k < this.enemies.length; k++) {
-                    this.enemies[k].body.supralinks = []
-                    for (let t = 0; t < this.nodes.length; t++) {
-                        if (this.enemies[k].body.rect == 1) {
-                            this.enemies[k].body.supralinks.push(new LineOPD(this.enemies[k].center, this.nodes[t]))
-                        } else {
-                            this.enemies[k].body.supralinks.push(new LineOPD(this.enemies[k].body, this.nodes[t]))
-                        }
+            this.partslog = [...json.parts]
+            // console.log(json.parts)
+
+            for (let g = 0; g < this.enemies.length; g++) {
+                for (let t = 0; t < this.enemies.length; t++) {
+                    if (json.parts.includes(this.enemies[t].type)) {
+                        this.enemies.splice(t, 1)
                     }
                 }
-                // if(this.loaded != 1){
-                // throbert.generate(9)
-                // }
+            }
+            for (let k = 0; k < this.enemies.length; k++) {
+                this.enemies[k].body.supralinks = []
+                for (let t = 0; t < this.nodes.length; t++) {
+                    if (this.enemies[k].body.rect == 1) {
+                        this.enemies[k].body.supralinks.push(new LineOPD(this.enemies[k].center, this.nodes[t]))
+                    } else {
+                        this.enemies[k].body.supralinks.push(new LineOPD(this.enemies[k].body, this.nodes[t]))
+                    }
+                }
             }
 
             for (let k = 0; k < this.enemies.length; k++) {
@@ -9423,11 +9367,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
 
             this.grab = 0
+            this.parts = this.partslog.length
         }
         save() {
             let json = {}
             json.exist = 1
+            json.parts = [...this.partslog]
             json.sprouts = []
+            json.enemies = []
             json.man = {}
             json.man.x = this.body.x
             json.man.y = this.body.y
@@ -9439,6 +9386,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 s.b = this.sproutventory[t].bloom
                 s.t = this.sproutventory[t].type
                 json.sprouts.push(s)
+            }
+            for (let t = 0; t < this.enemies.length; t++) {
+                let s = {}
+                s.x = this.enemies[t].body.x
+                s.y = this.enemies[t].body.y
+                s.n = this.enemies[t].constructor.name
+                s.t = this.enemies[t].type
+                s.c = this.enemies[t].colors
+                s.r = this.enemies[t].body.radius
+                json.enemies.push(s)
             }
             // console.log(JSON.stringify(json))
             for (let t = 0; t < savestates.length; t++) {
@@ -9845,7 +9802,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.savecooldown--
             if (keysPressed['`'] && !(this.savecooldown > 0)) {
                 this.save()
-                this.savecooldown = 100
+                this.savecooldown = 10
             }
             if (keysPressed['1']) {
                 if (savestates[0].exist == 1) {
@@ -11432,7 +11389,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         gamepadAPI.update()
         if (throbert.pause.paused == 1) {
             throbert.pause.draw()
-            if (gamepadAPI.buttonsStatus.includes('Back') || keysPressed[' ']) {
+            if (gamepadAPI.buttonsStatus.includes('Back') || keysPressed['Escape']) {
                 throbert.pause.paused = 0
             }
             return
