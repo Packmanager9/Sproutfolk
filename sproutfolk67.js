@@ -3935,9 +3935,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.body = new Circle(x, y, 15, this.colors[0])
             this.bodyarea = new Circle(x, y, 520, "red")
             this.go = this.body
-            this.health = 16000
+            this.health = 36000
             this.maxhealth = this.health
-            this.value = 21
+            this.value = 24
             this.body.timer = 999999999999 * 999999999999
             this.body.health = this.health
             this.weight = 21
@@ -4088,8 +4088,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.body.set = [this.body.x, this.body.y, 1]
             // gamepad_control(this.body, 2.5)
             if (this.health > 0) {
-                this.body.xmom += Math.cos(this.body.angle + Math.PI)
-                this.body.ymom += Math.sin(this.body.angle + Math.PI)
+                this.body.xmom += Math.cos(this.body.angle + Math.PI)*3
+                this.body.ymom += Math.sin(this.body.angle + Math.PI)*3
                 this.body.frictiveMove()
 
             } else {
@@ -9289,6 +9289,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     const enemy = new Part(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
                     this.enemies.push(enemy)
                     this.enemies[t].type = json.enemies[t].t
+                    this.enemies[t].body.radius = json.enemies[t].r
                 }else if(json.enemies[t].n == "Wallatoid"){
                     const enemy = new Wallatoid(json.enemies[t].x, json.enemies[t].y, json.enemies[t].c)
                     this.enemies.push(enemy)
